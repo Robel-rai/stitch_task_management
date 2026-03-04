@@ -215,6 +215,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               date: state.selectedCalendarDate,
               tasks: state.selectedDayTasks,
               onAddTask: () => _addTaskForDate(context, state),
+              onReorder: state.reorderDayTasks,
             ),
           ],
         );
@@ -396,57 +397,74 @@ class _CalendarGrid extends StatelessWidget {
                       ),
                     ),
                     Expanded(
-                      child: ClipRect(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 2),
-                            ...tasks.take(2).toList().asMap().entries.map((entry) {
-                              final t = entry.value;
-                              final color =
-                                  taskColors[entry.key % taskColors.length];
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 1),
-                                child: Draggable<int>(
-                                  data: t.id,
-                                  feedback: Material(
-                                    color: Colors.transparent,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: color,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Text(
-                                        t.title,
-                                        style: const TextStyle(
-                                          fontSize: 9,
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors.white,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          // Each pill is ~18px tall (padding + font), show as many as fit
+                          const pillHeight = 19.0;
+                          const moreHeight = 14.0;
+                          final availableHeight = constraints.maxHeight - 2; // SizedBox(2)
+                          int maxVisible = (availableHeight / pillHeight).floor();
+                          final hasMore = tasks.length > maxVisible;
+                          if (hasMore && maxVisible > 0) {
+                            // Reserve space for "+N more" label
+                            maxVisible = ((availableHeight - moreHeight) / pillHeight).floor();
+                            if (maxVisible < 0) maxVisible = 0;
+                          }
+                          final visibleTasks = tasks.take(maxVisible).toList();
+                          final remaining = tasks.length - visibleTasks.length;
+
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const SizedBox(height: 2),
+                              ...visibleTasks.asMap().entries.map((entry) {
+                                final t = entry.value;
+                                final color =
+                                    taskColors[entry.key % taskColors.length];
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 1),
+                                  child: Draggable<int>(
+                                    data: t.id,
+                                    feedback: Material(
+                                      color: Colors.transparent,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: color,
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: Text(
+                                          t.title,
+                                          style: const TextStyle(
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.white,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  childWhenDragging: Opacity(
-                                    opacity: 0.3,
+                                    childWhenDragging: Opacity(
+                                      opacity: 0.3,
+                                      child: _TaskPill(title: t.title, color: color),
+                                    ),
                                     child: _TaskPill(title: t.title, color: color),
                                   ),
-                                  child: _TaskPill(title: t.title, color: color),
+                                );
+                              }),
+                              if (remaining > 0)
+                                Text(
+                                  '+$remaining more',
+                                  style: const TextStyle(
+                                    fontSize: 8,
+                                    color: AppTheme.textTertiary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
-                              );
-                            }),
-                            if (tasks.length > 2)
-                              Text(
-                                '+${tasks.length - 2} more',
-                                style: const TextStyle(
-                                  fontSize: 8,
-                                  color: AppTheme.textTertiary,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                          ],
-                        ),
+                            ],
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -501,11 +519,13 @@ class _DayDetailPanel extends StatelessWidget {
   final DateTime date;
   final List<Task> tasks;
   final VoidCallback onAddTask;
+  final void Function(int oldIndex, int newIndex) onReorder;
 
   const _DayDetailPanel({
     required this.date,
     required this.tasks,
     required this.onAddTask,
+    required this.onReorder,
   });
 
   @override
@@ -557,49 +577,53 @@ class _DayDetailPanel extends StatelessWidget {
             ),
           ),
 
-          // Tasks list
+          // Tasks list with drag-to-reorder
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  ...tasks.map((t) => _DayTaskCard(task: t)),
-                  const SizedBox(height: 12),
-                  // Add task button
-                  InkWell(
-                    onTap: onAddTask,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: AppTheme.borderDark,
-                          style: BorderStyle.solid,
+            child: tasks.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 24),
+                        const Text(
+                          'No tasks for this day',
+                          style: TextStyle(fontSize: 12, color: AppTheme.textTertiary),
+                        ),
+                        const Spacer(),
+                        _addTaskButton(),
+                      ],
+                    ),
+                  )
+                : Column(
+                    children: [
+                      Expanded(
+                        child: ReorderableListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: tasks.length,
+                          onReorder: onReorder,
+                          proxyDecorator: (child, index, animation) {
+                            return Material(
+                              color: Colors.transparent,
+                              elevation: 4,
+                              shadowColor: Colors.black54,
+                              borderRadius: BorderRadius.circular(12),
+                              child: child,
+                            );
+                          },
+                          itemBuilder: (context, index) {
+                            return _DayTaskCard(
+                              key: ValueKey(tasks[index].id),
+                              task: tasks[index],
+                            );
+                          },
                         ),
                       ),
-                      child: const Column(
-                        children: [
-                          Icon(Icons.add_circle_outline,
-                              color: AppTheme.textTertiary),
-                          SizedBox(height: 4),
-                          Text(
-                            'ADD TASK',
-                            style: TextStyle(
-                              fontSize: 9,
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.textTertiary,
-                              letterSpacing: 1.5,
-                            ),
-                          ),
-                        ],
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: _addTaskButton(),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ),
           ),
 
           // Upcoming Events
@@ -675,11 +699,45 @@ class _DayDetailPanel extends StatelessWidget {
       ),
     );
   }
+
+  Widget _addTaskButton() {
+    return InkWell(
+      onTap: onAddTask,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppTheme.borderDark,
+            style: BorderStyle.solid,
+          ),
+        ),
+        child: const Column(
+          children: [
+            Icon(Icons.add_circle_outline,
+                color: AppTheme.textTertiary),
+            SizedBox(height: 4),
+            Text(
+              'ADD TASK',
+              style: TextStyle(
+                fontSize: 9,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.textTertiary,
+                letterSpacing: 1.5,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _DayTaskCard extends StatelessWidget {
   final Task task;
-  const _DayTaskCard({required this.task});
+  const _DayTaskCard({super.key, required this.task});
 
   @override
   Widget build(BuildContext context) {

@@ -6,6 +6,15 @@ import '../models/task.dart';
 /// Global application state managed by ChangeNotifier.
 /// All views listen to this for data changes.
 class AppState extends ChangeNotifier {
+  // ─── Theme ───
+  bool _isDarkMode = true;
+  bool get isDarkMode => _isDarkMode;
+
+  void toggleTheme() {
+    _isDarkMode = !_isDarkMode;
+    notifyListeners();
+  }
+
   // ─── Navigation ───
   int _currentNavIndex = 0;
   int get currentNavIndex => _currentNavIndex;
@@ -237,5 +246,12 @@ class AppState extends ChangeNotifier {
       await refreshAll();
       await selectCalendarDate(_selectedCalendarDate);
     }
+  }
+
+  void reorderDayTasks(int oldIndex, int newIndex) {
+    if (newIndex > oldIndex) newIndex--;
+    final item = _selectedDayTasks.removeAt(oldIndex);
+    _selectedDayTasks.insert(newIndex, item);
+    notifyListeners();
   }
 }

@@ -6,6 +6,7 @@ import 'screens/dashboard_screen.dart';
 import 'screens/tasks_screen.dart';
 import 'screens/calendar_screen.dart';
 import 'screens/analytics_screen.dart';
+import 'screens/settings_screen.dart';
 import 'theme/app_theme.dart';
 import 'widgets/sidebar.dart';
 
@@ -24,11 +25,15 @@ class TaskRecorderProApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => AppState()..initialize(),
-      child: MaterialApp(
-        title: 'Task Recorder Pro',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.darkTheme,
-        home: const AppShell(),
+      child: Consumer<AppState>(
+        builder: (context, state, _) {
+          return MaterialApp(
+            title: 'Taskflow',
+            debugShowCheckedModeBanner: false,
+            theme: state.isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
+            home: const AppShell(),
+          );
+        },
       ),
     );
   }
@@ -55,6 +60,7 @@ class AppShell extends StatelessWidget {
                     TasksScreen(),
                     CalendarScreen(),
                     AnalyticsScreen(),
+                    SettingsScreen(),
                   ],
                 );
               },
@@ -65,3 +71,4 @@ class AppShell extends StatelessWidget {
     );
   }
 }
+

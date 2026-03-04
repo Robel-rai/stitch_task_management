@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
 import '../theme/app_theme.dart';
@@ -29,17 +30,20 @@ class Sidebar extends StatelessWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: AppTheme.primary,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.polyline, color: Colors.white, size: 22),
+                      clipBehavior: Clip.antiAlias,
+                      child: SvgPicture.asset(
+                        'AppLogo/Task Flow.svg',
+                        fit: BoxFit.contain,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Recorder Pro',
+                          'Taskflow',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -105,9 +109,9 @@ class Sidebar extends StatelessWidget {
                         icon: Icons.settings_outlined,
                         activeIcon: Icons.settings,
                         label: 'Settings',
-                        index: -1,
+                        index: 4,
                         currentIndex: state.currentNavIndex,
-                        onTap: () {},
+                        onTap: () => state.setNavIndex(4),
                       ),
                     ],
                   ),
