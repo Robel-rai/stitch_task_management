@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Calendar - Task Recorder Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d0df2",
+                        "background-light": "#f5f5f8",
+                        "background-dark": "#101022",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .active-link {
+            background-color: rgba(13, 13, 242, 0.1);
+            border-left: 4px solid #0d0df2;
+        }
+        .calendar-grid {
+            grid-template-columns: repeat(7, 1fr);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased overflow-hidden">
+<div class="flex h-screen w-full">
+<!-- Sidebar Navigation -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 flex flex-col bg-white dark:bg-background-dark/50">
+<div class="p-6 flex items-center gap-3">
+<div class="size-10 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">record_voice_over</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-sm font-bold leading-none">Task Recorder Pro</h1>
+<span class="text-[10px] text-slate-500 font-medium mt-1 uppercase tracking-wider">Professional Plan</span>
+</div>
+</div>
+<nav class="flex-1 px-4 py-2 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors" href="#">
+<span class="material-symbols-outlined">check_box</span>
+<span class="text-sm font-medium">Tasks</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary border-r-4 border-primary transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">calendar_month</span>
+<span class="text-sm font-bold">Calendar</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors" href="#">
+<span class="material-symbols-outlined">work</span>
+<span class="text-sm font-medium">Projects</span>
+</a>
+<div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</div>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 p-2 rounded-xl bg-slate-100 dark:bg-slate-800/40">
+<div class="size-8 rounded-full bg-slate-300 dark:bg-slate-700 overflow-hidden">
+<img class="size-full object-cover" data-alt="User profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASSc8USIsffptyi14wk31P2_bsQhZHKMAlvpwF5gjMKp1-RkhSNLKRmIUlH_-JfnieHRL4qBd0xGnaHtpdg0N0HQ8p7g2nagzk86ybDsuhgyiJ1Vufkmz4AlDj21fMfQn0tzZYU4kr_OwvgjH7XClJYDD98fPh8j_ZxKKtWM9A21A8WiONRygCv7KCA7hiNLAmOwvwVIWOfLCzj3xnr4gAy2qtmofmL5ShcGc_SXq0aB3wQou2iF0YSPOJx9S1JJijwtQyesYou267"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-xs font-bold truncate">Alex Rivera</p>
+<p class="text-[10px] text-slate-500 truncate">alex@taskpro.com</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+<!-- Header -->
+<header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-background-dark/50 backdrop-blur-md flex items-center justify-between px-6">
+<div class="flex items-center gap-6">
+<h2 class="text-lg font-bold">October 2023</h2>
+<div class="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+<button class="p-1 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl">chevron_left</span>
+</button>
+<button class="px-3 py-1 text-xs font-bold uppercase tracking-wider">Today</button>
+<button class="p-1 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl">chevron_right</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+<button class="px-4 py-1.5 text-xs font-bold bg-white dark:bg-slate-700 rounded shadow-sm">Month</button>
+<button class="px-4 py-1.5 text-xs font-medium text-slate-500">Week</button>
+<button class="px-4 py-1.5 text-xs font-medium text-slate-500">Day</button>
+</div>
+<div class="h-8 w-px bg-slate-200 dark:border-slate-800"></div>
+<button class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-lg">add</span>
+                        New Event
+                    </button>
+</div>
+</header>
+<div class="flex-1 flex overflow-hidden">
+<!-- Calendar Grid -->
+<div class="flex-1 overflow-auto bg-slate-50 dark:bg-background-dark/30 p-4">
+<div class="min-w-[800px] h-full flex flex-col border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-background-dark overflow-hidden shadow-sm">
+<!-- Days Header -->
+<div class="grid calendar-grid border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+<div class="py-2 text-center text-[11px] font-bold text-slate-500 uppercase tracking-widest border-r border-slate-200 dark:border-slate-800">Sun</div>
+<div class="py-2 text-center text-[11px] font-bold text-slate-500 uppercase tracking-widest border-r border-slate-200 dark:border-slate-800">Mon</div>
+<div class="py-2 text-center text-[11px] font-bold text-slate-500 uppercase tracking-widest border-r border-slate-200 dark:border-slate-800">Tue</div>
+<div class="py-2 text-center text-[11px] font-bold text-slate-500 uppercase tracking-widest border-r border-slate-200 dark:border-slate-800">Wed</div>
+<div class="py-2 text-center text-[11px] font-bold text-slate-500 uppercase tracking-widest border-r border-slate-200 dark:border-slate-800">Thu</div>
+<div class="py-2 text-center text-[11px] font-bold text-slate-500 uppercase tracking-widest border-r border-slate-200 dark:border-slate-800">Fri</div>
+<div class="py-2 text-center text-[11px] font-bold text-slate-500 uppercase tracking-widest">Sat</div>
+</div>
+<!-- Calendar Cells -->
+<div class="flex-1 grid calendar-grid auto-rows-fr">
+<!-- Week 1 (Partial) -->
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px] bg-slate-50/50 dark:bg-slate-900/20 text-slate-400">24</div>
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px] bg-slate-50/50 dark:bg-slate-900/20 text-slate-400">25</div>
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px] bg-slate-50/50 dark:bg-slate-900/20 text-slate-400">26</div>
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px] bg-slate-50/50 dark:bg-slate-900/20 text-slate-400">27</div>
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px] bg-slate-50/50 dark:bg-slate-900/20 text-slate-400">28</div>
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px] bg-slate-50/50 dark:bg-slate-900/20 text-slate-400">29</div>
+<div class="border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px] bg-slate-50/50 dark:bg-slate-900/20 text-slate-400">30</div>
+<!-- Week 2 -->
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px] relative">
+<span class="text-sm font-semibold">1</span>
+<div class="mt-2 space-y-1">
+<div class="group flex items-center gap-1.5 px-2 py-1 bg-emerald-500/10 border-l-2 border-emerald-500 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded shadow-sm cursor-grab active:cursor-grabbing">
+<span class="material-symbols-outlined text-[14px]">drag_indicator</span>
+<span class="truncate">Review Meeting</span>
+</div>
+</div>
+</div>
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px]">
+<span class="text-sm font-semibold">2</span>
+</div>
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px] bg-primary/5">
+<span class="text-sm font-semibold text-primary">3</span>
+<div class="mt-2 space-y-1">
+<div class="group flex items-center gap-1.5 px-2 py-1 bg-primary border-l-2 border-primary text-white text-[10px] font-bold rounded shadow-md cursor-grab active:cursor-grabbing">
+<span class="material-symbols-outlined text-[14px]">drag_indicator</span>
+<span class="truncate">UI Design Sprint</span>
+</div>
+<div class="group flex items-center gap-1.5 px-2 py-1 bg-amber-500/10 border-l-2 border-amber-500 text-amber-600 dark:text-amber-400 text-[10px] font-bold rounded shadow-sm cursor-grab active:cursor-grabbing">
+<span class="material-symbols-outlined text-[14px]">drag_indicator</span>
+<span class="truncate">Client Call</span>
+</div>
+</div>
+</div>
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px]">
+<span class="text-sm font-semibold">4</span>
+</div>
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px] bg-primary/20 ring-2 ring-primary ring-inset z-10 shadow-lg">
+<span class="text-sm font-bold text-primary">5</span>
+<span class="absolute top-2 right-2 flex size-2 bg-primary rounded-full animate-pulse"></span>
+<div class="mt-2 space-y-1">
+<div class="group flex items-center gap-1.5 px-2 py-1 bg-indigo-500 border-l-2 border-indigo-700 text-white text-[10px] font-bold rounded shadow-md cursor-grab active:cursor-grabbing">
+<span class="material-symbols-outlined text-[14px]">drag_indicator</span>
+<span class="truncate">Beta Launch</span>
+</div>
+</div>
+</div>
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px]">
+<span class="text-sm font-semibold">6</span>
+</div>
+<div class="border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px]">
+<span class="text-sm font-semibold">7</span>
+</div>
+<!-- Repeated Rows for 31 days -->
+<!-- Row 3 -->
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px]"><span class="text-sm font-semibold">8</span></div>
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px]"><span class="text-sm font-semibold">9</span></div>
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px]"><span class="text-sm font-semibold">10</span></div>
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px]">
+<span class="text-sm font-semibold">11</span>
+<div class="mt-2">
+<div class="group flex items-center gap-1.5 px-2 py-1 bg-rose-500/10 border-l-2 border-rose-500 text-rose-600 dark:text-rose-400 text-[10px] font-bold rounded shadow-sm cursor-grab active:cursor-grabbing">
+<span class="material-symbols-outlined text-[14px]">drag_indicator</span>
+<span class="truncate">Urgent Fixes</span>
+</div>
+</div>
+</div>
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px]"><span class="text-sm font-semibold">12</span></div>
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px]"><span class="text-sm font-semibold">13</span></div>
+<div class="border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px]"><span class="text-sm font-semibold">14</span></div>
+<!-- Row 4 -->
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px]"><span class="text-sm font-semibold">15</span></div>
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px]"><span class="text-sm font-semibold">16</span></div>
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px]"><span class="text-sm font-semibold">17</span></div>
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px]"><span class="text-sm font-semibold">18</span></div>
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px]"><span class="text-sm font-semibold">19</span></div>
+<div class="border-r border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px]"><span class="text-sm font-semibold">20</span></div>
+<div class="border-b border-slate-200 dark:border-slate-800 p-2 min-h-[120px]"><span class="text-sm font-semibold">21</span></div>
+<!-- Row 5 -->
+<div class="border-r border-slate-200 dark:border-slate-800 p-2 min-h-[120px]"><span class="text-sm font-semibold">22</span></div>
+<div class="border-r border-slate-200 dark:border-slate-800 p-2 min-h-[120px]"><span class="text-sm font-semibold">23</span></div>
+<div class="border-r border-slate-200 dark:border-slate-800 p-2 min-h-[120px]"><span class="text-sm font-semibold">24</span></div>
+<div class="border-r border-slate-200 dark:border-slate-800 p-2 min-h-[120px]"><span class="text-sm font-semibold">25</span></div>
+<div class="border-r border-slate-200 dark:border-slate-800 p-2 min-h-[120px]"><span class="text-sm font-semibold">26</span></div>
+<div class="border-r border-slate-200 dark:border-slate-800 p-2 min-h-[120px]"><span class="text-sm font-semibold">27</span></div>
+<div class="p-2 min-h-[120px]"><span class="text-sm font-semibold">28</span></div>
+</div>
+</div>
+</div>
+<!-- Day Detail Side Panel -->
+<aside class="w-80 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark flex flex-col">
+<div class="p-6 border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center justify-between mb-2">
+<h3 class="text-lg font-bold">Oct 5, 2023</h3>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<p class="text-xs text-slate-500 font-medium">Thursday — 3 Tasks Scheduled</p>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<!-- Task Card -->
+<div class="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
+<div class="flex items-start justify-between">
+<div class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30">Release</div>
+<span class="material-symbols-outlined text-slate-400 cursor-grab">drag_indicator</span>
+</div>
+<div>
+<h4 class="text-sm font-bold">Beta Version Launch</h4>
+<p class="text-xs text-slate-500 mt-1">Final push to production server and announcement.</p>
+</div>
+<div class="flex items-center gap-3 pt-2">
+<div class="flex items-center gap-1 text-[10px] font-medium text-slate-400">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+                                    09:00 AM
+                                </div>
+<div class="flex -space-x-2">
+<div class="size-6 rounded-full border-2 border-white dark:border-slate-800 bg-slate-300 overflow-hidden">
+<img class="size-full object-cover" data-alt="Team member avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcDMeYna7CYochYbuou6js-tjTB7dQ6NsL2s7sXOj4N_4VfnScOXyn2J3x6b-xLds2ku_OQhZ3xmbM6_4Os-Q_oijJ1XO4AWgKFVuYT6zzxjl-CZKWWUPaMe-xsJ5kq7gAexKM6MqOWoUKdkTh4diOki9ygx_ndhjkrUrB-KrqO6NDhDltkf8HVIseGRx_ClF5I1UYD-6nd4x24y3A6067eq-KObiW7znNDxOQjaQOKshULsPvLt89t94GGk8V2qA6Ko9uPj0KPYSr"/>
+</div>
+<div class="size-6 rounded-full border-2 border-white dark:border-slate-800 bg-slate-300 overflow-hidden">
+<img class="size-full object-cover" data-alt="Team member avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4QmlGzYs6yk67NruinY2URztPhWE7IPlkDDjXgCbouo-3brSxgV-nQNVfxXZR0FyFtqCpPkFRnpTmQLFGPbmz-y6y6bGzQKs9vCyr9WeNYIQYVXFNAZvhPM5H_V920FBb8udGFKjEyK5sSLFi0JqufbbgjRInAqA0Oge_VZ0LYyKjI1LfLwuB5xNFOpA-Z26j74BFCmYZoI1tA3kHrtmdYBnUMJQf-gKLbf5jcow_PiUpkWGe6XzCu97XMawYdz2fEEHWlv1duf4e"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Task Card -->
+<div class="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
+<div class="flex items-start justify-between">
+<div class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-primary/20 text-primary border border-primary/30">Marketing</div>
+<span class="material-symbols-outlined text-slate-400 cursor-grab">drag_indicator</span>
+</div>
+<div>
+<h4 class="text-sm font-bold">Social Media Update</h4>
+<p class="text-xs text-slate-500 mt-1">Schedule posts for the launch week.</p>
+</div>
+<div class="flex items-center gap-1 text-[10px] font-medium text-slate-400 pt-2">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+                                02:30 PM
+                            </div>
+</div>
+<!-- Empty Task Placeholder -->
+<button class="w-full py-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center gap-2 text-slate-400 hover:text-primary hover:border-primary transition-all group">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">add_circle</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Add Task</span>
+</button>
+</div>
+<div class="p-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+<h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Upcoming Events</h4>
+<ul class="space-y-3">
+<li class="flex items-center gap-3">
+<div class="size-2 rounded-full bg-emerald-500"></div>
+<div class="flex-1">
+<p class="text-xs font-bold">Monthly Recap</p>
+<p class="text-[10px] text-slate-500">Oct 7 • 10:00 AM</p>
+</div>
+</li>
+<li class="flex items-center gap-3">
+<div class="size-2 rounded-full bg-amber-500"></div>
+<div class="flex-1">
+<p class="text-xs font-bold">Investor Call</p>
+<p class="text-[10px] text-slate-500">Oct 10 • 4:00 PM</p>
+</div>
+</li>
+</ul>
+</div>
+</aside>
+</div>
+</main>
+</div>
+</body></html>

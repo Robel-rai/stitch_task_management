@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Analytics &amp; Reporting - Task Recorder Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d0df2",
+                        "background-light": "#f5f5f8",
+                        "background-dark": "#101022",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .filled-icon { font-variation-settings: 'FILL' 1; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="flex h-screen overflow-hidden">
+<!-- Side Navigation -->
+<aside class="w-72 bg-slate-50 dark:bg-slate-900/50 border-r border-slate-200 dark:border-slate-800 flex flex-col">
+<div class="p-6 flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined">track_changes</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-white text-base font-bold leading-none">Task Recorder Pro</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs mt-1">Premium Plan</p>
+</div>
+</div>
+<nav class="flex-1 px-4 py-4 space-y-2">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-primary text-white rounded-lg shadow-lg shadow-primary/20" href="#">
+<span class="material-symbols-outlined filled-icon">analytics</span>
+<span class="text-sm font-medium">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">check_circle</span>
+<span class="text-sm font-medium">Tasks</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="text-sm font-medium">Projects</span>
+</a>
+<div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</div>
+</nav>
+<div class="p-4">
+<div class="bg-primary/10 dark:bg-primary/20 rounded-xl p-4 border border-primary/20">
+<p class="text-xs font-semibold text-primary uppercase tracking-wider">Storage Usage</p>
+<div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 mt-3">
+<div class="bg-primary h-1.5 rounded-full" style="width: 65%"></div>
+</div>
+<p class="text-[10px] text-slate-500 dark:text-slate-400 mt-2">6.5 GB of 10 GB used</p>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto scrollbar-hide">
+<!-- Header -->
+<header class="flex items-center justify-between px-8 py-6 sticky top-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md z-10 border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-4">
+<h2 class="text-xl font-bold text-slate-900 dark:text-white">Analytics &amp; Reporting</h2>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-900 border-none rounded-xl focus:ring-2 focus:ring-primary text-sm w-64 text-slate-100" placeholder="Search data..." type="text"/>
+</div>
+<button class="p-2 bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="size-10 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden border-2 border-primary/20">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="User avatar profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiUSfu0gf-BKWQM5PAEi5YOKJfJvwIy9AAJ8h9bPOfdoZCWlnah7vFLNTgtvrg9FagcmAnMNfiDCTQ2y71eK-5fRWDopqc-BvQVSEl5n1SBG-oZvZcbDsypyX1tF5tps81fcbCxR7l9ais2XT0NBrGnENcOAOAYKfsweC8LJOWXeNI_NzlbYuOgDOOl_81xwOK-ODbl_4tEHcRK1ER5qg-G-WEkwcvD9RiTR3HVLV6d8ppDFq6zN7zI7jL5hR59s8PQrmqqnxQibTn"/>
+</div>
+</div>
+</header>
+<div class="p-8 max-w-7xl mx-auto space-y-8">
+<!-- Top Stats -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-500 dark:text-slate-400 text-sm font-medium">Daily Productivity Score</span>
+<span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">speed</span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-3xl font-bold text-slate-900 dark:text-white">92</h3>
+<span class="text-emerald-500 text-sm font-bold flex items-center">
+<span class="material-symbols-outlined text-sm">arrow_upward</span>5%
+                            </span>
+</div>
+<p class="text-slate-400 text-xs mt-2">Versus last week's average</p>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-500 dark:text-slate-400 text-sm font-medium">Current Streak</span>
+<span class="material-symbols-outlined text-orange-500 bg-orange-500/10 p-2 rounded-lg">local_fire_department</span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-3xl font-bold text-slate-900 dark:text-white">15 days</h3>
+<span class="text-emerald-500 text-sm font-bold flex items-center">
+<span class="material-symbols-outlined text-sm">arrow_upward</span>2%
+                            </span>
+</div>
+<p class="text-slate-400 text-xs mt-2">Personal record: 22 days</p>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-500 dark:text-slate-400 text-sm font-medium">Avg. Completion Time</span>
+<span class="material-symbols-outlined text-blue-500 bg-blue-500/10 p-2 rounded-lg">timer</span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-3xl font-bold text-slate-900 dark:text-white">45m</h3>
+<span class="text-rose-500 text-sm font-bold flex items-center">
+<span class="material-symbols-outlined text-sm">arrow_downward</span>10%
+                            </span>
+</div>
+<p class="text-slate-400 text-xs mt-2">Faster than category average</p>
+</div>
+</div>
+<!-- Main Analytics Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- Radar Chart Container -->
+<div class="bg-white dark:bg-slate-900 p-8 rounded-xl border border-slate-200 dark:border-slate-800">
+<div class="flex justify-between items-start mb-8">
+<div>
+<h4 class="text-lg font-bold text-slate-900 dark:text-white">Category Performance</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400">Skill breakdown across disciplines</p>
+</div>
+<button class="text-primary text-sm font-bold hover:underline">Full Details</button>
+</div>
+<div class="flex items-center justify-center py-4">
+<!-- Visual Radar Chart Mockup -->
+<div class="relative w-64 h-64 border border-slate-200 dark:border-slate-800 rounded-full flex items-center justify-center">
+<div class="absolute inset-4 border border-slate-200/50 dark:border-slate-800/50 rounded-full"></div>
+<div class="absolute inset-12 border border-slate-200/30 dark:border-slate-800/30 rounded-full"></div>
+<div class="absolute inset-0 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-18" viewbox="0 0 100 100">
+<polygon fill="rgba(13, 13, 242, 0.2)" points="50,10 85,35 75,85 25,85 15,35" stroke="#0d0df2" stroke-width="1.5"></polygon>
+<line stroke="rgba(255,255,255,0.1)" stroke-width="0.5" x1="50" x2="50" y1="50" y2="10"></line>
+<line stroke="rgba(255,255,255,0.1)" stroke-width="0.5" x1="50" x2="85" y1="50" y2="35"></line>
+<line stroke="rgba(255,255,255,0.1)" stroke-width="0.5" x1="50" x2="75" y1="50" y2="85"></line>
+<line stroke="rgba(255,255,255,0.1)" stroke-width="0.5" x1="50" x2="25" y1="50" y2="85"></line>
+<line stroke="rgba(255,255,255,0.1)" stroke-width="0.5" x1="50" x2="15" y1="50" y2="35"></line>
+</svg>
+</div>
+<span class="absolute top-[-25px] text-[10px] font-bold uppercase tracking-tighter text-slate-400">Work</span>
+<span class="absolute right-[-35px] top-1/4 text-[10px] font-bold uppercase tracking-tighter text-slate-400">Study</span>
+<span class="absolute right-[-20px] bottom-0 text-[10px] font-bold uppercase tracking-tighter text-slate-400">Health</span>
+<span class="absolute left-[-20px] bottom-0 text-[10px] font-bold uppercase tracking-tighter text-slate-400">Social</span>
+<span class="absolute left-[-35px] top-1/4 text-[10px] font-bold uppercase tracking-tighter text-slate-400">Admin</span>
+</div>
+</div>
+</div>
+<!-- Line Chart Container -->
+<div class="bg-white dark:bg-slate-900 p-8 rounded-xl border border-slate-200 dark:border-slate-800">
+<div class="flex justify-between items-start mb-8">
+<div>
+<h4 class="text-lg font-bold text-slate-900 dark:text-white">Focus Time Per Day</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400">4.2h daily average</p>
+</div>
+<div class="flex gap-2">
+<button class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-medium">Week</button>
+<button class="px-3 py-1 text-slate-500 text-xs font-medium">Month</button>
+</div>
+</div>
+<div class="h-64 flex flex-col justify-end gap-6">
+<div class="relative flex-1">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 100 100">
+<path d="M0,80 Q10,75 20,40 T40,50 T60,20 T80,60 T100,30" fill="none" stroke="#0d0df2" stroke-width="2"></path>
+<path d="M0,80 Q10,75 20,40 T40,50 T60,20 T80,60 T100,30 V100 H0 Z" fill="url(#lineGradient)" opacity="0.1"></path>
+<defs>
+<lineargradient id="lineGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#0d0df2"></stop>
+<stop offset="100%" stop-color="transparent"></stop>
+</lineargradient>
+</defs>
+</svg>
+</div>
+<div class="flex justify-between text-xs text-slate-400 font-bold uppercase tracking-tighter">
+<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Export & Reporting Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Export Options -->
+<div class="lg:col-span-1 space-y-4">
+<h4 class="text-lg font-bold text-slate-900 dark:text-white px-2">Export Summary</h4>
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+<div class="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-blue-500">description</span>
+<div>
+<p class="text-sm font-bold">Monthly Summary</p>
+<p class="text-xs text-slate-400">PDF Document</p>
+</div>
+</div>
+<button class="p-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+<div class="p-6 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-emerald-500">table_chart</span>
+<div>
+<p class="text-sm font-bold">Raw Activity Data</p>
+<p class="text-xs text-slate-400">CSV Spreadsheet</p>
+</div>
+</div>
+<button class="p-2 bg-emerald-500/10 text-emerald-500 rounded-lg hover:bg-emerald-500/20 transition-all">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Weekly Productivity Report Preview (Popup Style Card) -->
+<div class="lg:col-span-2 space-y-4">
+<div class="flex items-center justify-between px-2">
+<h4 class="text-lg font-bold text-slate-900 dark:text-white">Reporting Preview</h4>
+<span class="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500">Draft</span>
+</div>
+<div class="relative bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8 shadow-xl">
+<!-- Report Modal Mockup -->
+<div class="border-b border-slate-100 dark:border-slate-800 pb-4 mb-6 flex justify-between items-end">
+<div>
+<p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Weekly Report</p>
+<h5 class="text-xl font-bold">Sept 18 — Sept 24, 2023</h5>
+</div>
+<img alt="Logo" class="size-8" data-alt="Task Recorder Pro mini brand logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOAbV3xHzvauo3mVWYpqTCLbDBKYRko-QIyojf0DZu7F96QOJI4Y9tDix-RW5_WSBFQouVPr_mnlpVyzBsg6p6K_mKtz6MkYEhwcOmbYi9M2xVh9zaR-d6HplwMPryGgsDjZoviReTpUojVi7W-fxRuxJPDjvWhAD-7z8goRL8NUR-vChZr22z31oUDeiNRDcbEVJ1lTaeDomwV8PFi81kbyEaGGwgLI5sj3vq2qdlJXgr_as1xr6El34S4-lpXSc-CC_jhKdieAnG"/>
+</div>
+<div class="grid grid-cols-2 gap-8">
+<div class="space-y-4">
+<h6 class="text-xs font-bold text-slate-400 uppercase tracking-tighter">Summary Insights</h6>
+<ul class="space-y-3">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-emerald-500 text-sm mt-0.5">check_circle</span>
+<p class="text-sm">Completed 128 tasks this week, a 12% increase from last period.</p>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-sm mt-0.5">info</span>
+<p class="text-sm">Deep focus peaks occurred between 10:00 AM and 12:30 PM.</p>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-orange-500 text-sm mt-0.5">warning</span>
+<p class="text-sm">Meeting time increased by 4h. Recommend "Focus Block" scheduling.</p>
+</li>
+</ul>
+</div>
+<div class="space-y-4 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl">
+<h6 class="text-xs font-bold text-slate-400 uppercase tracking-tighter">Top Categories</h6>
+<div class="space-y-3">
+<div>
+<div class="flex justify-between text-xs mb-1"><span>Development</span><span>42%</span></div>
+<div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 42%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs mb-1"><span>Strategic Planning</span><span>28%</span></div>
+<div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+<div class="bg-blue-400 h-full rounded-full" style="width: 28%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs mb-1"><span>Management</span><span>15%</span></div>
+<div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+<div class="bg-purple-500 h-full rounded-full" style="width: 15%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Preview Overlay Actions -->
+<div class="absolute inset-0 bg-background-dark/20 backdrop-blur-[2px] rounded-xl flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+<div class="flex gap-4">
+<button class="bg-primary text-white px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-xl">
+<span class="material-symbols-outlined">send</span> Send to Email
+                                    </button>
+<button class="bg-white text-slate-900 px-6 py-2.5 rounded-xl font-bold shadow-xl">
+                                        Full Report
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
