@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'app_colors.dart';
 
 class AppTheme {
-  static const Color primary = Color(0xFF1818A1);
+  static const Color primary = Color(0xFF090966);
   static const Color backgroundDark = Color(0xFF101022);
-  static const Color backgroundLight = Color(0xFFF5F5F8);
+  static const Color backgroundLight = Color(0xFFD4D4FF);
   static const Color surfaceDark = Color(0xFF0F172A); // slate-900
   static const Color surfaceVariantDark = Color(0xFF1E293B); // slate-800
   static const Color borderDark = Color(0xFF1E293B);
@@ -70,6 +71,7 @@ class AppTheme {
 
   static ThemeData get darkTheme {
     return ThemeData(
+      extensions: [AppThemeColors.dark()],
       brightness: Brightness.dark,
       fontFamily: 'Inter',
       scaffoldBackgroundColor: backgroundDark,
@@ -150,6 +152,7 @@ class AppTheme {
 
   static ThemeData get lightTheme {
     return ThemeData(
+      extensions: [AppThemeColors.light()],
       brightness: Brightness.light,
       fontFamily: 'Inter',
       scaffoldBackgroundColor: backgroundLight_,

@@ -3,20 +3,23 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
 import '../theme/app_theme.dart';
+import '../theme/app_colors.dart';
 
 class Sidebar extends StatelessWidget {
   const Sidebar({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+
     return Consumer<AppState>(
       builder: (context, state, _) {
         return Container(
           width: 256,
           decoration: BoxDecoration(
-            color: AppTheme.backgroundDark.withValues(alpha: 0.5),
-            border: const Border(
-              right: BorderSide(color: AppTheme.borderDark),
+            color: colors.sidebarBackground,
+            border: Border(
+              right: BorderSide(color: colors.border),
             ),
           ),
           child: Column(
@@ -42,19 +45,19 @@ class Sidebar extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Taskflow',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
-                            color: AppTheme.textPrimary,
+                            color: colors.textPrimary,
                           ),
                         ),
                         Text(
                           'Premium Plan',
                           style: TextStyle(
                             fontSize: 10,
-                            color: AppTheme.textTertiary,
+                            color: colors.textTertiary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -103,7 +106,7 @@ class Sidebar extends StatelessWidget {
                         onTap: () => state.setNavIndex(3),
                       ),
                       const SizedBox(height: 16),
-                      const Divider(color: AppTheme.borderDark),
+                      Divider(color: colors.border),
                       const SizedBox(height: 8),
                       _NavItem(
                         icon: Icons.settings_outlined,
@@ -121,8 +124,8 @@ class Sidebar extends StatelessWidget {
               // User Profile
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  border: Border(top: BorderSide(color: AppTheme.borderDark)),
+                decoration: BoxDecoration(
+                  border: Border(top: BorderSide(color: colors.border)),
                 ),
                 child: Row(
                   children: [
@@ -144,7 +147,7 @@ class Sidebar extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -153,21 +156,21 @@ class Sidebar extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: AppTheme.textPrimary,
+                              color: colors.textPrimary,
                             ),
                           ),
                           Text(
                             'Pro Plan Member',
                             style: TextStyle(
                               fontSize: 10,
-                              color: AppTheme.textTertiary,
+                              color: colors.textTertiary,
                             ),
                           ),
                         ],
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.logout, size: 18, color: AppTheme.textSecondary),
+                      icon: Icon(Icons.logout, size: 18, color: colors.textSecondary),
                       onPressed: () {},
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
@@ -204,6 +207,8 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: Material(
@@ -217,7 +222,7 @@ class _NavItem extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
               color: isActive
-                  ? AppTheme.primary
+                  ? colors.navItemActive
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(10),
             ),
@@ -227,8 +232,8 @@ class _NavItem extends StatelessWidget {
                   isActive ? activeIcon : icon,
                   size: 20,
                   color: isActive
-                      ? Colors.white
-                      : AppTheme.textSecondary,
+                      ? colors.navItemActiveText
+                      : colors.navItemInactiveText,
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -237,8 +242,8 @@ class _NavItem extends StatelessWidget {
                     fontSize: 14,
                     fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
                     color: isActive
-                        ? Colors.white
-                        : AppTheme.textSecondary,
+                        ? colors.navItemActiveText
+                        : colors.navItemInactiveText,
                   ),
                 ),
               ],

@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
 import '../theme/app_theme.dart';
+import '../theme/app_colors.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+
     return Consumer<AppState>(
       builder: (context, state, _) {
         final isDark = state.isDarkMode;
@@ -19,25 +22,21 @@ class SettingsScreen extends StatelessWidget {
               height: 64,
               padding: const EdgeInsets.symmetric(horizontal: 24),
               decoration: BoxDecoration(
-                color: isDark ? AppTheme.backgroundDark : Colors.white,
+                color: colors.background,
                 border: Border(
-                  bottom: BorderSide(
-                    color: isDark ? AppTheme.borderDark : const Color(0xFFE2E8F0),
-                  ),
+                  bottom: BorderSide(color: colors.border),
                 ),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.settings,
-                      size: 22,
-                      color: isDark ? AppTheme.textPrimary : const Color(0xFF1E293B)),
+                  Icon(Icons.settings, size: 22, color: colors.textPrimary),
                   const SizedBox(width: 12),
                   Text(
                     'Settings',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: isDark ? AppTheme.textPrimary : const Color(0xFF1E293B),
+                      color: colors.textPrimary,
                     ),
                   ),
                 ],
@@ -57,7 +56,7 @@ class SettingsScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        color: isDark ? AppTheme.textTertiary : const Color(0xFF94A3B8),
+                        color: colors.textTertiary,
                         letterSpacing: 1.5,
                       ),
                     ),
@@ -67,13 +66,9 @@ class SettingsScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: isDark
-                            ? AppTheme.surfaceVariantDark.withValues(alpha: 0.4)
-                            : Colors.white,
+                        color: colors.surfaceVariant.withValues(alpha: 0.4),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isDark ? AppTheme.borderDark : const Color(0xFFE2E8F0),
-                        ),
+                        border: Border.all(color: colors.border),
                       ),
                       child: Row(
                         children: [
@@ -84,7 +79,7 @@ class SettingsScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: isDark
                                   ? AppTheme.primary.withValues(alpha: 0.15)
-                                  : const Color(0xFFF1F5F9),
+                                  : colors.surfaceVariant,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Icon(
@@ -103,9 +98,7 @@ class SettingsScreen extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
-                                    color: isDark
-                                        ? AppTheme.textPrimary
-                                        : const Color(0xFF1E293B),
+                                    color: colors.textPrimary,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
@@ -115,9 +108,7 @@ class SettingsScreen extends StatelessWidget {
                                       : 'Switch to dark mode for a darker look',
                                   style: TextStyle(
                                     fontSize: 11,
-                                    color: isDark
-                                        ? AppTheme.textTertiary
-                                        : const Color(0xFF94A3B8),
+                                    color: colors.textTertiary,
                                   ),
                                 ),
                               ],
@@ -302,7 +293,7 @@ class SettingsScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        color: isDark ? AppTheme.textTertiary : const Color(0xFF94A3B8),
+                        color: colors.textTertiary,
                         letterSpacing: 1.5,
                       ),
                     ),
@@ -311,27 +302,17 @@ class SettingsScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: isDark
-                            ? AppTheme.surfaceVariantDark.withValues(alpha: 0.4)
-                            : Colors.white,
+                        color: colors.surfaceVariant.withValues(alpha: 0.4),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isDark ? AppTheme.borderDark : const Color(0xFFE2E8F0),
-                        ),
+                        border: Border.all(color: colors.border),
                       ),
                       child: Column(
                         children: [
-                          _infoRow('App Name', 'Taskflow', isDark),
-                          Divider(
-                            color: isDark ? AppTheme.borderDark : const Color(0xFFE2E8F0),
-                            height: 24,
-                          ),
-                          _infoRow('Version', '1.0.0', isDark),
-                          Divider(
-                            color: isDark ? AppTheme.borderDark : const Color(0xFFE2E8F0),
-                            height: 24,
-                          ),
-                          _infoRow('Platform', 'Windows Desktop', isDark),
+                          _infoRow('App Name', 'Taskflow', colors),
+                          Divider(color: colors.border, height: 24),
+                          _infoRow('Version', '1.0.0', colors),
+                          Divider(color: colors.border, height: 24),
+                          _infoRow('Platform', 'Windows Desktop', colors),
                         ],
                       ),
                     ),
@@ -345,7 +326,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _infoRow(String label, String value, bool isDark) {
+  Widget _infoRow(String label, String value, AppThemeColors colors) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -353,7 +334,7 @@ class SettingsScreen extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 13,
-            color: isDark ? AppTheme.textSecondary : const Color(0xFF64748B),
+            color: colors.textSecondary,
           ),
         ),
         Text(
@@ -361,7 +342,7 @@ class SettingsScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: isDark ? AppTheme.textPrimary : const Color(0xFF1E293B),
+            color: colors.textPrimary,
           ),
         ),
       ],

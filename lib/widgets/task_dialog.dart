@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/task.dart';
 import '../theme/app_theme.dart';
+import '../theme/app_colors.dart';
 
 /// Dialog for creating or editing a task.
 class TaskDialog extends StatefulWidget {
@@ -60,8 +61,10 @@ class _TaskDialogState extends State<TaskDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+
     return Dialog(
-      backgroundColor: AppTheme.surfaceDark,
+      backgroundColor: colors.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         width: 480,
@@ -76,26 +79,26 @@ class _TaskDialogState extends State<TaskDialog> {
               children: [
                 Text(
                   isEditing ? 'Edit Task' : 'New Task',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
+                    color: colors.textPrimary,
                   ),
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close, color: AppTheme.textSecondary),
+                  icon: Icon(Icons.close, color: colors.textSecondary),
                 ),
               ],
             ),
             const SizedBox(height: 24),
 
             // Title
-            _buildField('Title', _titleCtrl, 'Enter task title...'),
+            _buildField('Title', _titleCtrl, 'Enter task title...', colors),
             const SizedBox(height: 16),
 
             // Description
-            _buildField('Description', _descCtrl, 'Enter description...',
+            _buildField('Description', _descCtrl, 'Enter description...', colors,
                 maxLines: 3),
             const SizedBox(height: 16),
 
@@ -103,21 +106,21 @@ class _TaskDialogState extends State<TaskDialog> {
             Row(
               children: [
                 Expanded(child: _buildDropdown('Category', _category, categories,
-                    (v) => setState(() => _category = v!))),
+                    (v) => setState(() => _category = v!), colors)),
                 const SizedBox(width: 16),
                 Expanded(child: _buildDropdown('Priority', _priority, priorities,
-                    (v) => setState(() => _priority = v!))),
+                    (v) => setState(() => _priority = v!), colors)),
               ],
             ),
             const SizedBox(height: 16),
 
             // Status
             _buildDropdown('Status', _status, statuses,
-                (v) => setState(() => _status = v!)),
+                (v) => setState(() => _status = v!), colors),
             const SizedBox(height: 16),
 
             // Scheduled Date
-            _buildDatePicker(),
+            _buildDatePicker(colors),
             const SizedBox(height: 28),
 
             // Actions
@@ -126,9 +129,9 @@ class _TaskDialogState extends State<TaskDialog> {
               children: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text(
+                  child: Text(
                     'Cancel',
-                    style: TextStyle(color: AppTheme.textSecondary),
+                    style: TextStyle(color: colors.textSecondary),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -150,28 +153,28 @@ class _TaskDialogState extends State<TaskDialog> {
   }
 
   Widget _buildField(
-      String label, TextEditingController ctrl, String hint,
+      String label, TextEditingController ctrl, String hint, AppThemeColors colors,
       {int maxLines = 1}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: AppTheme.textSecondary,
+            color: colors.textSecondary,
           ),
         ),
         const SizedBox(height: 6),
         TextField(
           controller: ctrl,
           maxLines: maxLines,
-          style: const TextStyle(fontSize: 14, color: AppTheme.textPrimary),
+          style: TextStyle(fontSize: 14, color: colors.textPrimary),
           decoration: InputDecoration(
             hintText: hint,
             filled: true,
-            fillColor: AppTheme.surfaceVariantDark,
+            fillColor: colors.surfaceVariant,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide.none,
@@ -183,31 +186,31 @@ class _TaskDialogState extends State<TaskDialog> {
   }
 
   Widget _buildDropdown(
-      String label, String value, List<String> items, ValueChanged<String?> onChanged) {
+      String label, String value, List<String> items, ValueChanged<String?> onChanged, AppThemeColors colors) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: AppTheme.textSecondary,
+            color: colors.textSecondary,
           ),
         ),
         const SizedBox(height: 6),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: AppTheme.surfaceVariantDark,
+            color: colors.surfaceVariant,
             borderRadius: BorderRadius.circular(10),
           ),
           child: DropdownButton<String>(
             value: value,
             isExpanded: true,
             underline: const SizedBox(),
-            dropdownColor: AppTheme.surfaceVariantDark,
-            style: const TextStyle(fontSize: 14, color: AppTheme.textPrimary),
+            dropdownColor: colors.surfaceVariant,
+            style: TextStyle(fontSize: 14, color: colors.textPrimary),
             items: items
                 .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                 .toList(),
@@ -218,16 +221,18 @@ class _TaskDialogState extends State<TaskDialog> {
     );
   }
 
-  Widget _buildDatePicker() {
+  Widget _buildDatePicker(AppThemeColors colors) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Scheduled Date',
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: AppTheme.textSecondary,
+            color: colors.textSecondary,
           ),
         ),
         const SizedBox(height: 6),
@@ -240,11 +245,16 @@ class _TaskDialogState extends State<TaskDialog> {
               lastDate: DateTime(2100),
               builder: (context, child) {
                 return Theme(
-                  data: ThemeData.dark().copyWith(
-                    colorScheme: const ColorScheme.dark(
-                      primary: AppTheme.primary,
-                      surface: AppTheme.surfaceDark,
-                    ),
+                  data: (isDark ? ThemeData.dark() : ThemeData.light()).copyWith(
+                    colorScheme: isDark
+                        ? ColorScheme.dark(
+                            primary: AppTheme.primary,
+                            surface: colors.surface,
+                          )
+                        : ColorScheme.light(
+                            primary: AppTheme.primary,
+                            surface: colors.surface,
+                          ),
                   ),
                   child: child!,
                 );
@@ -257,13 +267,13 @@ class _TaskDialogState extends State<TaskDialog> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
             decoration: BoxDecoration(
-              color: AppTheme.surfaceVariantDark,
+              color: colors.surfaceVariant,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
               children: [
-                const Icon(Icons.calendar_today,
-                    size: 16, color: AppTheme.textSecondary),
+                Icon(Icons.calendar_today,
+                    size: 16, color: colors.textSecondary),
                 const SizedBox(width: 10),
                 Text(
                   _scheduledDate != null
@@ -272,8 +282,8 @@ class _TaskDialogState extends State<TaskDialog> {
                   style: TextStyle(
                     fontSize: 14,
                     color: _scheduledDate != null
-                        ? AppTheme.textPrimary
-                        : AppTheme.textTertiary,
+                        ? colors.textPrimary
+                        : colors.textTertiary,
                   ),
                 ),
               ],

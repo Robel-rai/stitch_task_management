@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/task.dart';
 import '../providers/app_state.dart';
 import '../theme/app_theme.dart';
+import '../theme/app_colors.dart';
 import '../widgets/task_card.dart';
 import '../widgets/task_dialog.dart';
 
@@ -18,6 +19,8 @@ class _TasksScreenState extends State<TasksScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+
     return Consumer<AppState>(
       builder: (context, state, _) {
         return Row(
@@ -31,19 +34,19 @@ class _TasksScreenState extends State<TasksScreen> {
                     height: 64,
                     padding: const EdgeInsets.symmetric(horizontal: 32),
                     decoration: BoxDecoration(
-                      color: AppTheme.backgroundDark,
-                      border: const Border(
-                        bottom: BorderSide(color: AppTheme.borderDark),
+                      color: colors.background,
+                      border: Border(
+                        bottom: BorderSide(color: colors.border),
                       ),
                     ),
                     child: Row(
                       children: [
-                        const Text(
+                        Text(
                           'Tasks',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
-                            color: AppTheme.textPrimary,
+                            color: colors.textPrimary,
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -54,14 +57,14 @@ class _TasksScreenState extends State<TasksScreen> {
                             height: 36,
                             child: TextField(
                               onChanged: state.setSearchQuery,
-                              style: const TextStyle(
-                                  fontSize: 13, color: AppTheme.textPrimary),
+                              style: TextStyle(
+                                  fontSize: 13, color: colors.textPrimary),
                               decoration: InputDecoration(
                                 hintText: 'Search tasks...',
-                                prefixIcon: const Icon(Icons.search,
-                                    size: 18, color: AppTheme.textSecondary),
+                                prefixIcon: Icon(Icons.search,
+                                    size: 18, color: colors.textSecondary),
                                 filled: true,
-                                fillColor: AppTheme.surfaceVariantDark,
+                                fillColor: colors.surfaceVariant,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide.none,
@@ -75,8 +78,8 @@ class _TasksScreenState extends State<TasksScreen> {
                         const Spacer(),
                         IconButton(
                           onPressed: () {},
-                          icon: const Icon(Icons.notifications_outlined,
-                              color: AppTheme.textSecondary),
+                          icon: Icon(Icons.notifications_outlined,
+                              color: colors.textSecondary),
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton.icon(
@@ -139,7 +142,7 @@ class _TasksScreenState extends State<TasksScreen> {
                         Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
-                            color: AppTheme.surfaceVariantDark,
+                            color: colors.surfaceVariant,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
@@ -173,22 +176,22 @@ class _TasksScreenState extends State<TasksScreen> {
                                 Icon(Icons.task_alt,
                                     size: 64,
                                     color:
-                                        AppTheme.textTertiary.withValues(alpha: 0.3)),
+                                        colors.textTertiary.withValues(alpha: 0.3)),
                                 const SizedBox(height: 16),
-                                const Text(
+                                Text(
                                   'No tasks found',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
-                                    color: AppTheme.textTertiary,
+                                    color: colors.textTertiary,
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                const Text(
+                                Text(
                                   'Create your first task to get started',
                                   style: TextStyle(
                                     fontSize: 13,
-                                    color: AppTheme.textTertiary,
+                                    color: colors.textTertiary,
                                   ),
                                 ),
                               ],
@@ -274,17 +277,18 @@ class _TasksScreenState extends State<TasksScreen> {
 
   void _showDeleteDialog(
       BuildContext context, AppState state, Task task) async {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.surfaceDark,
+        backgroundColor: colors.surface,
         title: const Text('Delete Task'),
         content: Text('Delete "${task.title}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel',
-                style: TextStyle(color: AppTheme.textSecondary)),
+            child: Text('Cancel',
+                style: TextStyle(color: colors.textSecondary)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
@@ -320,12 +324,13 @@ class _TasksScreenState extends State<TasksScreen> {
 
   void _showFilterMenu(
       BuildContext context, List<String> items, ValueChanged<String> onSelect) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
     final RenderBox button = context.findRenderObject() as RenderBox;
     final offset = button.localToGlobal(Offset.zero);
     showMenu<String>(
       context: context,
       position: RelativeRect.fromLTRB(offset.dx, offset.dy + 40, 0, 0),
-      color: AppTheme.surfaceVariantDark,
+      color: colors.surfaceVariant,
       items: items
           .map((e) => PopupMenuItem(value: e, child: Text(e)))
           .toList(),
@@ -348,8 +353,10 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+
     return Material(
-      color: AppTheme.surfaceVariantDark,
+      color: colors.surfaceVariant,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: onTap,
@@ -358,20 +365,20 @@ class _FilterChip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppTheme.borderDark),
+            border: Border.all(color: colors.border),
           ),
           child: Row(
             children: [
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: AppTheme.textPrimary,
+                  color: colors.textPrimary,
                 ),
               ),
               const SizedBox(width: 4),
-              Icon(icon, size: 16, color: AppTheme.textSecondary),
+              Icon(icon, size: 16, color: colors.textSecondary),
             ],
           ),
         ),
@@ -392,12 +399,14 @@ class _ViewToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: active ? AppTheme.surfaceDark : Colors.transparent,
+          color: active ? colors.surface : Colors.transparent,
           borderRadius: BorderRadius.circular(6),
           boxShadow: active
               ? [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4)]
@@ -406,7 +415,7 @@ class _ViewToggle extends StatelessWidget {
         child: Icon(
           icon,
           size: 20,
-          color: active ? AppTheme.primary : AppTheme.textTertiary,
+          color: active ? AppTheme.primary : colors.textTertiary,
         ),
       ),
     );
@@ -419,15 +428,16 @@ class _ListTaskItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
     final catColor = AppTheme.getCategoryColor(task.category);
     final statusColor = AppTheme.getStatusColor(task.status);
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceDark,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.borderDark),
+        border: Border.all(color: colors.border),
       ),
       child: Row(
         children: [
@@ -445,7 +455,7 @@ class _ListTaskItem extends StatelessWidget {
                 border: Border.all(
                   color: task.status == 'Completed'
                       ? AppTheme.emerald
-                      : AppTheme.textTertiary,
+                      : colors.textTertiary,
                   width: 2,
                 ),
               ),
@@ -464,7 +474,7 @@ class _ListTaskItem extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppTheme.textPrimary,
+                    color: colors.textPrimary,
                     decoration: task.status == 'Completed'
                         ? TextDecoration.lineThrough
                         : null,
@@ -476,7 +486,7 @@ class _ListTaskItem extends StatelessWidget {
                     child: Text(
                       task.description,
                       style:
-                          const TextStyle(fontSize: 12, color: AppTheme.textTertiary),
+                          TextStyle(fontSize: 12, color: colors.textTertiary),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -499,7 +509,7 @@ class _ListTaskItem extends StatelessWidget {
           const SizedBox(width: 12),
           Text(
             task.formattedTimeFriendly,
-            style: const TextStyle(fontSize: 12, color: AppTheme.textTertiary),
+            style: TextStyle(fontSize: 12, color: colors.textTertiary),
           ),
           const SizedBox(width: 12),
           Container(
@@ -523,6 +533,7 @@ class _ScheduleSidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
     final todayTasks = tasks
         .where((t) =>
             t.scheduledDate != null &&
@@ -538,22 +549,22 @@ class _ScheduleSidebar extends StatelessWidget {
 
     return Container(
       width: 320,
-      decoration: const BoxDecoration(
-        color: AppTheme.backgroundDark,
-        border: Border(left: BorderSide(color: AppTheme.borderDark)),
+      decoration: BoxDecoration(
+        color: colors.background,
+        border: Border(left: BorderSide(color: colors.border)),
       ),
       child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(24),
-            child: const Align(
+            child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 "Today's Schedule",
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.textPrimary,
+                  color: colors.textPrimary,
                 ),
               ),
             ),
@@ -565,43 +576,43 @@ class _ScheduleSidebar extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Upcoming Deadlines
-                  const Text(
+                  Text(
                     'UPCOMING DEADLINES',
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.textTertiary,
+                      color: colors.textTertiary,
                       letterSpacing: 1.5,
                     ),
                   ),
                   const SizedBox(height: 12),
                   if (upcomingDeadlines.isEmpty)
-                    const Text(
+                    Text(
                       'No upcoming deadlines',
                       style: TextStyle(
-                          fontSize: 13, color: AppTheme.textTertiary),
+                          fontSize: 13, color: colors.textTertiary),
                     )
                   else
                     ...upcomingDeadlines.map((t) => _DeadlineItem(task: t)),
                   const SizedBox(height: 24),
-                  const Divider(color: AppTheme.borderDark),
+                  Divider(color: colors.border),
                   const SizedBox(height: 16),
                   // Today's tasks
-                  const Text(
+                  Text(
                     'TODAY',
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.textTertiary,
+                      color: colors.textTertiary,
                       letterSpacing: 1.5,
                     ),
                   ),
                   const SizedBox(height: 12),
                   if (todayTasks.isEmpty)
-                    const Text(
+                    Text(
                       'No tasks scheduled for today',
                       style: TextStyle(
-                          fontSize: 13, color: AppTheme.textTertiary),
+                          fontSize: 13, color: colors.textTertiary),
                     )
                   else
                     ...todayTasks.map((t) => _TodayTaskItem(task: t)),
@@ -623,12 +634,12 @@ class _ScheduleSidebar extends StatelessWidget {
                   const Icon(Icons.auto_awesome,
                       size: 28, color: AppTheme.primary),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Weekly Report Ready!',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.textPrimary,
+                      color: colors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -636,7 +647,7 @@ class _ScheduleSidebar extends StatelessWidget {
                     'Review your productivity insights',
                     style: TextStyle(
                       fontSize: 10,
-                      color: AppTheme.textTertiary,
+                      color: colors.textTertiary,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -675,6 +686,7 @@ class _DeadlineItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
     final isUrgent = task.priority == 'High';
     final color = isUrgent ? AppTheme.rose : AppTheme.primary;
 
@@ -696,10 +708,10 @@ class _DeadlineItem extends StatelessWidget {
               children: [
                 Text(
                   task.title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
+                    color: colors.textPrimary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -707,8 +719,8 @@ class _DeadlineItem extends StatelessWidget {
                 if (task.scheduledDate != null)
                   Text(
                     _formatDate(task.scheduledDate!),
-                    style: const TextStyle(
-                        fontSize: 10, color: AppTheme.textTertiary),
+                    style: TextStyle(
+                        fontSize: 10, color: colors.textTertiary),
                   ),
               ],
             ),
@@ -733,6 +745,7 @@ class _TodayTaskItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
     final isActive = task.isTimerRunning;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -740,7 +753,7 @@ class _TodayTaskItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: isActive
             ? AppTheme.primary.withValues(alpha: 0.1)
-            : AppTheme.surfaceVariantDark.withValues(alpha: 0.5),
+            : colors.surfaceVariant.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(10),
         border: isActive
             ? Border.all(color: AppTheme.primary.withValues(alpha: 0.2))
@@ -754,7 +767,7 @@ class _TodayTaskItem extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              color: isActive ? AppTheme.primary : AppTheme.textPrimary,
+              color: isActive ? AppTheme.primary : colors.textPrimary,
             ),
           ),
           if (isActive)

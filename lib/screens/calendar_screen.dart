@@ -5,6 +5,7 @@ import '../database/database.dart';
 import '../models/task.dart';
 import '../providers/app_state.dart';
 import '../theme/app_theme.dart';
+import '../theme/app_colors.dart';
 import '../widgets/task_dialog.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -42,6 +43,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+
     return Consumer<AppState>(
       builder: (context, state, _) {
         final month = state.viewingMonth;
@@ -57,10 +60,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   Container(
                     height: 64,
                     padding: const EdgeInsets.symmetric(horizontal: 24),
-                    decoration: const BoxDecoration(
-                      color: AppTheme.backgroundDark,
+                    decoration: BoxDecoration(
+                      color: colors.background,
                       border: Border(
-                        bottom: BorderSide(color: AppTheme.borderDark),
+                        bottom: BorderSide(color: colors.border),
                       ),
                     ),
                     child: Row(
@@ -70,23 +73,23 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           children: [
                             Text(
                               monthName,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
-                                color: AppTheme.textPrimary,
+                                color: colors.textPrimary,
                               ),
                             ),
                             const SizedBox(width: 16),
                             Container(
                               decoration: BoxDecoration(
-                                color: AppTheme.surfaceVariantDark,
+                                color: colors.surfaceVariant,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
                                 children: [
                                   IconButton(
-                                    icon: const Icon(Icons.chevron_left,
-                                        size: 20, color: AppTheme.textSecondary),
+                                    icon: Icon(Icons.chevron_left,
+                                        size: 20, color: colors.textSecondary),
                                     onPressed: () {
                                       state.setViewingMonth(DateTime(
                                           month.year, month.month - 1));
@@ -108,19 +111,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                         _loadMonthTasks,
                                       );
                                     },
-                                    child: const Text(
+                                    child: Text(
                                       'TODAY',
                                       style: TextStyle(
                                         fontSize: 10,
                                         fontWeight: FontWeight.w700,
-                                        color: AppTheme.textPrimary,
+                                        color: colors.textPrimary,
                                         letterSpacing: 1,
                                       ),
                                     ),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.chevron_right,
-                                        size: 20, color: AppTheme.textSecondary),
+                                    icon: Icon(Icons.chevron_right,
+                                        size: 20, color: colors.textSecondary),
                                     onPressed: () {
                                       state.setViewingMonth(DateTime(
                                           month.year, month.month + 1));
@@ -143,14 +146,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             Container(
                               padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
-                                color: AppTheme.surfaceVariantDark,
+                                color: colors.surfaceVariant,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
                                 children: [
-                                  _viewBtn('Month', true),
-                                  _viewBtn('Week', false),
-                                  _viewBtn('Day', false),
+                                  _viewBtn('Month', true, colors),
+                                  _viewBtn('Week', false, colors),
+                                  _viewBtn('Day', false, colors),
                                 ],
                               ),
                             ),
@@ -179,9 +182,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     child: Container(
                       margin: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppTheme.backgroundDark,
+                        color: colors.background,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppTheme.borderDark),
+                        border: Border.all(color: colors.border),
                       ),
                       child: Column(
                         children: [
@@ -223,11 +226,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  Widget _viewBtn(String label, bool active) {
+  Widget _viewBtn(String label, bool active, AppThemeColors colors) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: active ? AppTheme.surfaceDark : Colors.transparent,
+        color: active ? colors.surface : Colors.transparent,
         borderRadius: BorderRadius.circular(6),
         boxShadow: active
             ? [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4)]
@@ -238,7 +241,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         style: TextStyle(
           fontSize: 11,
           fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-          color: active ? AppTheme.textPrimary : AppTheme.textTertiary,
+          color: active ? colors.textPrimary : colors.textTertiary,
         ),
       ),
     );
@@ -265,29 +268,30 @@ class _CalendarScreenState extends State<CalendarScreen> {
 class _DayHeaders extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
     const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.surfaceVariantDark.withValues(alpha: 0.5),
-        border: const Border(bottom: BorderSide(color: AppTheme.borderDark)),
+        color: colors.surfaceVariant.withValues(alpha: 0.5),
+        border: Border(bottom: BorderSide(color: colors.border)),
       ),
       child: Row(
         children: days
             .map((d) => Expanded(
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       border: Border(
                           right: BorderSide(
-                              color: AppTheme.borderDark, width: 0.5)),
+                              color: colors.border, width: 0.5)),
                     ),
                     child: Center(
                       child: Text(
                         d,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.textTertiary,
+                          color: colors.textTertiary,
                           letterSpacing: 1.5,
                         ),
                       ),
@@ -317,6 +321,7 @@ class _CalendarGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
     final firstDay = DateTime(month.year, month.month, 1);
     final lastDay = DateTime(month.year, month.month + 1, 0);
     final startOffset = firstDay.weekday % 7; // Sunday = 0
@@ -370,12 +375,12 @@ class _CalendarGrid extends StatelessWidget {
                       : candidateData.isNotEmpty
                           ? AppTheme.primary.withValues(alpha: 0.1)
                           : !isCurrentMonth
-                              ? AppTheme.surfaceDark.withValues(alpha: 0.2)
+                              ? colors.surface.withValues(alpha: 0.2)
                               : null,
                   border: Border.all(
                     color: isSelected
                         ? AppTheme.primary
-                        : AppTheme.borderDark.withValues(alpha: 0.5),
+                        : colors.border.withValues(alpha: 0.5),
                     width: isSelected ? 2 : 0.5,
                   ),
                 ),
@@ -392,21 +397,19 @@ class _CalendarGrid extends StatelessWidget {
                         color: isToday
                             ? AppTheme.primary
                             : isCurrentMonth
-                                ? AppTheme.textPrimary
-                                : AppTheme.textTertiary,
+                                ? colors.textPrimary
+                                : colors.textTertiary,
                       ),
                     ),
                     Expanded(
                       child: LayoutBuilder(
                         builder: (context, constraints) {
-                          // Each pill is ~18px tall (padding + font), show as many as fit
                           const pillHeight = 19.0;
                           const moreHeight = 14.0;
-                          final availableHeight = constraints.maxHeight - 2; // SizedBox(2)
+                          final availableHeight = constraints.maxHeight - 2;
                           int maxVisible = (availableHeight / pillHeight).floor();
                           final hasMore = tasks.length > maxVisible;
                           if (hasMore && maxVisible > 0) {
-                            // Reserve space for "+N more" label
                             maxVisible = ((availableHeight - moreHeight) / pillHeight).floor();
                             if (maxVisible < 0) maxVisible = 0;
                           }
@@ -456,9 +459,9 @@ class _CalendarGrid extends StatelessWidget {
                               if (remaining > 0)
                                 Text(
                                   '+$remaining more',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 8,
-                                    color: AppTheme.textTertiary,
+                                    color: colors.textTertiary,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -485,6 +488,8 @@ class _TaskPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
@@ -495,7 +500,7 @@ class _TaskPill extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.drag_indicator, size: 10, color: AppTheme.textTertiary),
+          Icon(Icons.drag_indicator, size: 10, color: colors.textTertiary),
           const SizedBox(width: 2),
           Flexible(
             child: Text(
@@ -530,23 +535,24 @@ class _DayDetailPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
     final dayName = DateFormat('EEEE').format(date);
     final dateStr = DateFormat('MMM d, yyyy').format(date);
 
     return Container(
       width: 320,
-      decoration: const BoxDecoration(
-        color: AppTheme.backgroundDark,
-        border: Border(left: BorderSide(color: AppTheme.borderDark)),
+      decoration: BoxDecoration(
+        color: colors.background,
+        border: Border(left: BorderSide(color: colors.border)),
       ),
       child: Column(
         children: [
           // Header
           Container(
             padding: const EdgeInsets.all(24),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               border:
-                  Border(bottom: BorderSide(color: AppTheme.borderDark)),
+                  Border(bottom: BorderSide(color: colors.border)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -556,10 +562,10 @@ class _DayDetailPanel extends StatelessWidget {
                   children: [
                     Text(
                       dateStr,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.textPrimary,
+                        color: colors.textPrimary,
                       ),
                     ),
                   ],
@@ -567,10 +573,10 @@ class _DayDetailPanel extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   '$dayName — ${tasks.length} Tasks Scheduled',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
-                    color: AppTheme.textTertiary,
+                    color: colors.textTertiary,
                   ),
                 ),
               ],
@@ -585,12 +591,12 @@ class _DayDetailPanel extends StatelessWidget {
                     child: Column(
                       children: [
                         const SizedBox(height: 24),
-                        const Text(
+                        Text(
                           'No tasks for this day',
-                          style: TextStyle(fontSize: 12, color: AppTheme.textTertiary),
+                          style: TextStyle(fontSize: 12, color: colors.textTertiary),
                         ),
                         const Spacer(),
-                        _addTaskButton(),
+                        _addTaskButton(colors),
                       ],
                     ),
                   )
@@ -620,7 +626,7 @@ class _DayDetailPanel extends StatelessWidget {
                       ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                        child: _addTaskButton(),
+                        child: _addTaskButton(colors),
                       ),
                     ],
                   ),
@@ -630,28 +636,28 @@ class _DayDetailPanel extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: AppTheme.surfaceDark.withValues(alpha: 0.5),
-              border: const Border(
-                  top: BorderSide(color: AppTheme.borderDark)),
+              color: colors.surface.withValues(alpha: 0.5),
+              border: Border(
+                  top: BorderSide(color: colors.border)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'UPCOMING EVENTS',
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.textTertiary,
+                    color: colors.textTertiary,
                     letterSpacing: 1,
                   ),
                 ),
                 const SizedBox(height: 12),
                 if (tasks.isEmpty)
-                  const Text(
+                  Text(
                     'No events for this day',
                     style:
-                        TextStyle(fontSize: 12, color: AppTheme.textTertiary),
+                        TextStyle(fontSize: 12, color: colors.textTertiary),
                   )
                 else
                   ...tasks.take(3).map((t) => Padding(
@@ -673,17 +679,17 @@ class _DayDetailPanel extends StatelessWidget {
                                 children: [
                                   Text(
                                     t.title,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w700,
-                                      color: AppTheme.textPrimary,
+                                      color: colors.textPrimary,
                                     ),
                                   ),
                                   Text(
                                     t.category,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 10,
-                                      color: AppTheme.textTertiary,
+                                      color: colors.textTertiary,
                                     ),
                                   ),
                                 ],
@@ -700,7 +706,7 @@ class _DayDetailPanel extends StatelessWidget {
     );
   }
 
-  Widget _addTaskButton() {
+  Widget _addTaskButton(AppThemeColors colors) {
     return InkWell(
       onTap: onAddTask,
       borderRadius: BorderRadius.circular(12),
@@ -710,21 +716,21 @@ class _DayDetailPanel extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: AppTheme.borderDark,
+            color: colors.border,
             style: BorderStyle.solid,
           ),
         ),
-        child: const Column(
+        child: Column(
           children: [
             Icon(Icons.add_circle_outline,
-                color: AppTheme.textTertiary),
-            SizedBox(height: 4),
+                color: colors.textTertiary),
+            const SizedBox(height: 4),
             Text(
               'ADD TASK',
               style: TextStyle(
                 fontSize: 9,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.textTertiary,
+                color: colors.textTertiary,
                 letterSpacing: 1.5,
               ),
             ),
@@ -741,15 +747,16 @@ class _DayTaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
     final catColor = AppTheme.getCategoryColor(task.category);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceVariantDark.withValues(alpha: 0.4),
+        color: colors.surfaceVariant.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.borderDark),
+        border: Border.all(color: colors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -775,17 +782,17 @@ class _DayTaskCard extends StatelessWidget {
                   ),
                 ),
               ),
-              const Icon(Icons.drag_indicator,
-                  size: 18, color: AppTheme.textTertiary),
+              Icon(Icons.drag_indicator,
+                  size: 18, color: colors.textTertiary),
             ],
           ),
           const SizedBox(height: 10),
           Text(
             task.title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              color: AppTheme.textPrimary,
+              color: colors.textPrimary,
             ),
           ),
           if (task.description.isNotEmpty)
@@ -794,7 +801,7 @@ class _DayTaskCard extends StatelessWidget {
               child: Text(
                 task.description,
                 style:
-                    const TextStyle(fontSize: 11, color: AppTheme.textTertiary),
+                    TextStyle(fontSize: 11, color: colors.textTertiary),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -802,15 +809,15 @@ class _DayTaskCard extends StatelessWidget {
           const SizedBox(height: 10),
           Row(
             children: [
-              const Icon(Icons.schedule,
-                  size: 12, color: AppTheme.textTertiary),
+              Icon(Icons.schedule,
+                  size: 12, color: colors.textTertiary),
               const SizedBox(width: 4),
               Text(
                 task.formattedTimeFriendly,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w500,
-                  color: AppTheme.textTertiary,
+                  color: colors.textTertiary,
                 ),
               ),
             ],

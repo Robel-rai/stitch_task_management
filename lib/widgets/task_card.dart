@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/task.dart';
 import '../providers/app_state.dart';
 import '../theme/app_theme.dart';
+import '../theme/app_colors.dart';
 
 class TaskCard extends StatelessWidget {
   final Task task;
@@ -11,6 +12,7 @@ class TaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
     final catColor = AppTheme.getCategoryColor(task.category);
     final priorityColor = AppTheme.getPriorityColor(task.priority);
     final statusColor = AppTheme.getStatusColor(task.status);
@@ -18,9 +20,9 @@ class TaskCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceDark,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.borderDark),
+        border: Border.all(color: colors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,10 +84,10 @@ class TaskCard extends StatelessWidget {
               children: [
                 Text(
                   task.title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
+                    color: colors.textPrimary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -94,9 +96,9 @@ class TaskCard extends StatelessWidget {
                 Flexible(
                   child: Text(
                     task.description.isNotEmpty ? task.description : 'No description',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppTheme.textSecondary,
+                      color: colors.textSecondary,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -115,16 +117,16 @@ class TaskCard extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.schedule, size: 14, color: AppTheme.textTertiary),
+                    Icon(Icons.schedule, size: 14, color: colors.textTertiary),
                     const SizedBox(width: 4),
                     Text(
                       task.isTimerRunning
                           ? _formatLive(task.currentTimeSpentSeconds)
                           : task.formattedTimeSpent,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
-                        color: AppTheme.textTertiary,
+                        color: colors.textTertiary,
                       ),
                     ),
                   ],
@@ -168,8 +170,8 @@ class TaskCard extends StatelessWidget {
           // Footer: created date + play/pause
           Container(
             padding: const EdgeInsets.only(top: 10),
-            decoration: const BoxDecoration(
-              border: Border(top: BorderSide(color: AppTheme.borderDark)),
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: colors.border)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -177,9 +179,9 @@ class TaskCard extends StatelessWidget {
                 Flexible(
                   child: Text(
                     'Created: ${_formatDate(task.createdAt)}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 10,
-                      color: AppTheme.textTertiary,
+                      color: colors.textTertiary,
                       fontWeight: FontWeight.w500,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -216,6 +218,8 @@ class _TimerButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+
     if (task.status == 'Completed') {
       return Container(
         width: 40,
@@ -244,15 +248,15 @@ class _TimerButton extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: isRunning
-              ? AppTheme.surfaceDark
+              ? colors.surface
               : AppTheme.primary,
           border: isRunning
-              ? Border.all(color: AppTheme.textSecondary.withValues(alpha: 0.3))
+              ? Border.all(color: colors.textSecondary.withValues(alpha: 0.3))
               : null,
         ),
         child: Icon(
           isRunning ? Icons.pause : Icons.play_arrow,
-          color: isRunning ? AppTheme.textPrimary : Colors.white,
+          color: isRunning ? colors.textPrimary : Colors.white,
           size: 20,
         ),
       ),

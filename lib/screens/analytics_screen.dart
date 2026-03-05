@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../services/analytics_service.dart';
 import '../services/reporting_service.dart';
 import '../theme/app_theme.dart';
+import '../theme/app_colors.dart';
 
 class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});
@@ -56,6 +57,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+
     if (_loading) {
       return const Center(
         child: CircularProgressIndicator(color: AppTheme.primary),
@@ -69,20 +72,20 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           height: 64,
           padding: const EdgeInsets.symmetric(horizontal: 32),
           decoration: BoxDecoration(
-            color: AppTheme.backgroundDark.withValues(alpha: 0.8),
-            border: const Border(
-              bottom: BorderSide(color: AppTheme.borderDark),
+            color: colors.background.withValues(alpha: 0.8),
+            border: Border(
+              bottom: BorderSide(color: colors.border),
             ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Analytics & Reporting',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.textPrimary,
+                  color: colors.textPrimary,
                 ),
               ),
               Row(
@@ -91,25 +94,25 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     width: 256,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: AppTheme.surfaceDark,
+                      color: colors.surface,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const TextField(
-                      style: TextStyle(fontSize: 13, color: AppTheme.textPrimary),
+                    child: TextField(
+                      style: TextStyle(fontSize: 13, color: colors.textPrimary),
                       decoration: InputDecoration(
                         hintText: 'Search data...',
                         prefixIcon: Icon(Icons.search,
-                            size: 18, color: AppTheme.textSecondary),
+                            size: 18, color: colors.textSecondary),
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(vertical: 10),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 10),
                       ),
                     ),
                   ),
                   const SizedBox(width: 12),
                   IconButton(
                     onPressed: () {},
-                    icon: const Icon(Icons.notifications_outlined,
-                        color: AppTheme.textSecondary),
+                    icon: Icon(Icons.notifications_outlined,
+                        color: colors.textSecondary),
                   ),
                 ],
               ),
@@ -223,12 +226,14 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceDark,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.borderDark),
+        border: Border.all(color: colors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -237,10 +242,10 @@ class _StatCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(label,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: AppTheme.textSecondary)),
+                      color: colors.textSecondary)),
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
@@ -257,10 +262,10 @@ class _StatCard extends StatelessWidget {
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text(value,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.textPrimary)),
+                      color: colors.textPrimary)),
               const SizedBox(width: 8),
               Row(
                 children: [
@@ -283,8 +288,8 @@ class _StatCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(subtitle,
-              style: const TextStyle(
-                  fontSize: 11, color: AppTheme.textTertiary)),
+              style: TextStyle(
+                  fontSize: 11, color: colors.textTertiary)),
         ],
       ),
     );
@@ -298,12 +303,14 @@ class _CategoryRadar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceDark,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.borderDark),
+        border: Border.all(color: colors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -314,15 +321,15 @@ class _CategoryRadar extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Category Performance',
+                  Text('Category Performance',
                       style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.textPrimary)),
+                          color: colors.textPrimary)),
                   const SizedBox(height: 4),
                   Text('Completion rate per category',
                       style: TextStyle(
-                          fontSize: 13, color: AppTheme.textTertiary)),
+                          fontSize: 13, color: colors.textTertiary)),
                 ],
               ),
               TextButton(
@@ -350,7 +357,7 @@ class _CategoryRadar extends StatelessWidget {
                       data.isEmpty
                           ? 'No category data yet'
                           : 'Need at least 3 categories for radar chart',
-                      style: const TextStyle(color: AppTheme.textTertiary),
+                      style: TextStyle(color: colors.textTertiary),
                     ),
                     if (data.isNotEmpty) ...[
                       const SizedBox(height: 16),
@@ -361,16 +368,16 @@ class _CategoryRadar extends StatelessWidget {
                               children: [
                                 Container(
                                   width: 8, height: 8,
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                     shape: BoxShape.circle,
                                     color: AppTheme.primary,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 Text('${e.key}: ${e.value.toStringAsFixed(0)}%',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         fontSize: 12,
-                                        color: AppTheme.textPrimary)),
+                                        color: colors.textPrimary)),
                               ],
                             ),
                           )),
@@ -395,22 +402,22 @@ class _CategoryRadar extends StatelessWidget {
                     ),
                   ],
                   radarBorderData: BorderSide(
-                    color: AppTheme.borderDark.withValues(alpha: 0.5),
+                    color: colors.border.withValues(alpha: 0.5),
                   ),
                   tickBorderData: BorderSide(
-                    color: AppTheme.borderDark.withValues(alpha: 0.3),
+                    color: colors.border.withValues(alpha: 0.3),
                   ),
                   gridBorderData: BorderSide(
-                    color: AppTheme.borderDark.withValues(alpha: 0.3),
+                    color: colors.border.withValues(alpha: 0.3),
                   ),
                   radarBackgroundColor: Colors.transparent,
                   tickCount: 4,
-                  ticksTextStyle: const TextStyle(
-                      fontSize: 8, color: AppTheme.textTertiary),
-                  titleTextStyle: const TextStyle(
+                  ticksTextStyle: TextStyle(
+                      fontSize: 8, color: colors.textTertiary),
+                  titleTextStyle: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.textSecondary,
+                    color: colors.textSecondary,
                   ),
                   getTitle: (index, _) {
                     final keys = data.keys.toList();
@@ -436,14 +443,15 @@ class _FocusTimeChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceDark,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.borderDark),
+        border: Border.all(color: colors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -454,21 +462,21 @@ class _FocusTimeChart extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Focus Time Per Day',
+                  Text('Focus Time Per Day',
                       style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.textPrimary)),
+                          color: colors.textPrimary)),
                   const SizedBox(height: 4),
                   Text('${avgHours.toStringAsFixed(1)}h daily average',
                       style: TextStyle(
-                          fontSize: 13, color: AppTheme.textTertiary)),
+                          fontSize: 13, color: colors.textTertiary)),
                 ],
               ),
               Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: AppTheme.surfaceVariantDark,
+                  color: colors.surfaceVariant,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -477,20 +485,20 @@ class _FocusTimeChart extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppTheme.surfaceDark,
+                        color: colors.surface,
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: const Text('Week',
+                      child: Text('Week',
                           style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w500,
-                              color: AppTheme.textPrimary)),
+                              color: colors.textPrimary)),
                     ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Text('Month',
                           style: TextStyle(
-                              fontSize: 11, color: AppTheme.textTertiary)),
+                              fontSize: 11, color: colors.textTertiary)),
                     ),
                   ],
                 ),
@@ -507,7 +515,7 @@ class _FocusTimeChart extends StatelessWidget {
                   drawVerticalLine: false,
                   horizontalInterval: 1,
                   getDrawingHorizontalLine: (_) => FlLine(
-                    color: AppTheme.borderDark.withValues(alpha: 0.3),
+                    color: colors.border.withValues(alpha: 0.3),
                     strokeWidth: 0.5,
                   ),
                 ),
@@ -519,10 +527,10 @@ class _FocusTimeChart extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 8),
                         child: Text(
                           days[value.toInt()],
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
-                            color: AppTheme.textTertiary,
+                            color: colors.textTertiary,
                           ),
                         ),
                       ),
@@ -561,7 +569,7 @@ class _FocusTimeChart extends StatelessWidget {
                 ],
                 lineTouchData: LineTouchData(
                   touchTooltipData: LineTouchTooltipData(
-                    getTooltipColor: (_) => AppTheme.surfaceDark,
+                    getTooltipColor: (_) => colors.surface,
                     getTooltipItems: (spots) => spots.map((s) {
                       return LineTooltipItem(
                         '${s.y.toStringAsFixed(1)}h',
@@ -587,23 +595,25 @@ class _FocusTimeChart extends StatelessWidget {
 class _ExportSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Text('Export Summary',
               style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.textPrimary)),
+                  color: colors.textPrimary)),
         ),
         const SizedBox(height: 16),
         Container(
           decoration: BoxDecoration(
-            color: AppTheme.surfaceDark,
+            color: colors.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppTheme.borderDark),
+            border: Border.all(color: colors.border),
           ),
           child: Column(
             children: [
@@ -622,7 +632,7 @@ class _ExportSection extends StatelessWidget {
                   }
                 },
               ),
-              const Divider(color: AppTheme.borderDark, height: 1),
+              Divider(color: colors.border, height: 1),
               _ExportItem(
                 icon: Icons.table_chart,
                 iconColor: AppTheme.emerald,
@@ -665,6 +675,8 @@ class _ExportItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Row(
@@ -678,13 +690,13 @@ class _ExportItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.textPrimary)),
+                          color: colors.textPrimary)),
                   Text(subtitle,
-                      style: const TextStyle(
-                          fontSize: 11, color: AppTheme.textTertiary)),
+                      style: TextStyle(
+                          fontSize: 11, color: colors.textTertiary)),
                 ],
               ),
             ],
@@ -714,6 +726,7 @@ class _WeeklyReportPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
     final startDate = report['startDate'] as DateTime?;
     final endDate = report['endDate'] as DateTime?;
     final insights =
@@ -736,23 +749,23 @@ class _WeeklyReportPreview extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Text('Reporting Preview',
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.textPrimary)),
+                      color: colors.textPrimary)),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: AppTheme.surfaceVariantDark,
+                color: colors.surfaceVariant,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Text('Draft',
+              child: Text('Draft',
                   style: TextStyle(
-                      fontSize: 11, color: AppTheme.textTertiary)),
+                      fontSize: 11, color: colors.textTertiary)),
             ),
           ],
         ),
@@ -760,9 +773,9 @@ class _WeeklyReportPreview extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            color: AppTheme.surfaceDark,
+            color: colors.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppTheme.borderDark),
+            border: Border.all(color: colors.border),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.2),
@@ -777,9 +790,9 @@ class _WeeklyReportPreview extends StatelessWidget {
               // Report Header
               Container(
                 padding: const EdgeInsets.only(bottom: 16),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   border: Border(
-                      bottom: BorderSide(color: AppTheme.borderDark)),
+                      bottom: BorderSide(color: colors.border)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -802,10 +815,10 @@ class _WeeklyReportPreview extends StatelessWidget {
                           startDate != null && endDate != null
                               ? '${DateFormat('MMM dd').format(startDate)} — ${DateFormat('MMM dd, yyyy').format(endDate)}'
                               : 'This Week',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
-                            color: AppTheme.textPrimary,
+                            color: colors.textPrimary,
                           ),
                         ),
                       ],
@@ -834,21 +847,21 @@ class _WeeklyReportPreview extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'SUMMARY INSIGHTS',
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
-                            color: AppTheme.textTertiary,
+                            color: colors.textTertiary,
                             letterSpacing: 1,
                           ),
                         ),
                         const SizedBox(height: 16),
                         if (insights.isEmpty)
-                          const Text(
+                          Text(
                             'Complete some tasks to see insights.',
                             style: TextStyle(
-                                fontSize: 13, color: AppTheme.textTertiary),
+                                fontSize: 13, color: colors.textTertiary),
                           )
                         else
                           ...insights.map((insight) {
@@ -869,7 +882,7 @@ class _WeeklyReportPreview extends StatelessWidget {
                                 break;
                               default:
                                 ic = Icons.info;
-                                col = AppTheme.textTertiary;
+                                col = colors.textTertiary;
                             }
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 12),
@@ -881,9 +894,9 @@ class _WeeklyReportPreview extends StatelessWidget {
                                   Flexible(
                                     child: Text(
                                       insight['text'] ?? '',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                           fontSize: 13,
-                                          color: AppTheme.textPrimary),
+                                          color: colors.textPrimary),
                                     ),
                                   ),
                                 ],
@@ -900,28 +913,28 @@ class _WeeklyReportPreview extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppTheme.surfaceVariantDark.withValues(alpha: 0.5),
+                        color: colors.surfaceVariant.withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'TOP CATEGORIES',
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
-                              color: AppTheme.textTertiary,
+                              color: colors.textTertiary,
                               letterSpacing: 1,
                             ),
                           ),
                           const SizedBox(height: 16),
                           if (categories.isEmpty)
-                            const Text(
+                            Text(
                               'No data yet',
                               style: TextStyle(
                                   fontSize: 13,
-                                  color: AppTheme.textTertiary),
+                                  color: colors.textTertiary),
                             )
                           else
                             ...categories.entries.take(5).map((entry) {
@@ -929,7 +942,7 @@ class _WeeklyReportPreview extends StatelessWidget {
                                   ? (entry.value / total * 100).round()
                                   : 0;
                               final color = catColors[entry.key] ??
-                                  AppTheme.textTertiary;
+                                  colors.textTertiary;
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 12),
                                 child: Column(
@@ -939,15 +952,15 @@ class _WeeklyReportPreview extends StatelessWidget {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(entry.key,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                                 fontSize: 12,
                                                 color:
-                                                    AppTheme.textPrimary)),
+                                                    colors.textPrimary)),
                                         Text('$pct%',
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                                 fontSize: 12,
                                                 color:
-                                                    AppTheme.textPrimary)),
+                                                    colors.textPrimary)),
                                       ],
                                     ),
                                     const SizedBox(height: 6),
@@ -956,8 +969,7 @@ class _WeeklyReportPreview extends StatelessWidget {
                                           BorderRadius.circular(100),
                                       child: LinearProgressIndicator(
                                         value: pct / 100,
-                                        backgroundColor: AppTheme
-                                            .surfaceVariantDark,
+                                        backgroundColor: colors.surfaceVariant,
                                         color: color,
                                         minHeight: 6,
                                       ),

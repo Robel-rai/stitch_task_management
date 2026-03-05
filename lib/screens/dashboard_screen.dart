@@ -3,6 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
 import '../theme/app_theme.dart';
+import '../theme/app_colors.dart';
 import '../widgets/kpi_card.dart';
 import '../widgets/task_dialog.dart';
 import '../services/notification_service.dart';
@@ -26,6 +27,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+
     return Consumer<AppState>(
       builder: (context, state, _) {
         return Column(
@@ -35,20 +38,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
               height: 64,
               padding: const EdgeInsets.symmetric(horizontal: 32),
               decoration: BoxDecoration(
-                color: AppTheme.backgroundDark.withValues(alpha: 0.5),
-                border: const Border(
-                  bottom: BorderSide(color: AppTheme.borderDark),
+                color: colors.background.withValues(alpha: 0.5),
+                border: Border(
+                  bottom: BorderSide(color: colors.border),
                 ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Activity Overview',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: colors.textPrimary,
                     ),
                   ),
                   Row(
@@ -63,14 +66,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                         child: TextField(
                           onChanged: state.setSearchQuery,
-                          style: const TextStyle(
-                              fontSize: 13, color: AppTheme.textPrimary),
-                          decoration: const InputDecoration(
+                          style: TextStyle(
+                              fontSize: 13, color: colors.textPrimary),
+                          decoration: InputDecoration(
                             hintText: 'Search activities...',
                             prefixIcon: Icon(Icons.search,
-                                size: 18, color: AppTheme.textSecondary),
+                                size: 18, color: colors.textSecondary),
                             border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(vertical: 10),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 10),
                           ),
                         ),
                       ),
@@ -193,6 +196,8 @@ class _HeaderIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+
     return Stack(
       children: [
         Material(
@@ -203,7 +208,7 @@ class _HeaderIconButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             child: Container(
               padding: const EdgeInsets.all(8),
-              child: Icon(icon, size: 20, color: AppTheme.textSecondary),
+              child: Icon(icon, size: 20, color: colors.textSecondary),
             ),
           ),
         ),
@@ -217,7 +222,7 @@ class _HeaderIconButton extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppTheme.rose,
                 shape: BoxShape.circle,
-                border: Border.all(color: AppTheme.backgroundDark, width: 2),
+                border: Border.all(color: colors.background, width: 2),
               ),
             ),
           ),
@@ -233,6 +238,7 @@ class _WeeklyBarChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
     final maxVal = data.values.fold<int>(0, (a, b) => a > b ? a : b);
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -252,12 +258,12 @@ class _WeeklyBarChart extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Weekly Productivity',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.textPrimary,
+                      color: colors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -265,7 +271,7 @@ class _WeeklyBarChart extends StatelessWidget {
                     'Completed tasks per day',
                     style: TextStyle(
                       fontSize: 13,
-                      color: AppTheme.textTertiary,
+                      color: colors.textTertiary,
                     ),
                   ),
                 ],
@@ -292,7 +298,7 @@ class _WeeklyBarChart extends StatelessWidget {
                 maxY: maxVal > 0 ? maxVal.toDouble() + 2 : 10,
                 barTouchData: BarTouchData(
                   touchTooltipData: BarTouchTooltipData(
-                    getTooltipColor: (_) => AppTheme.surfaceDark,
+                    getTooltipColor: (_) => colors.surface,
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
                       return BarTooltipItem(
                         '${rod.toY.round()} Tasks',
@@ -314,9 +320,9 @@ class _WeeklyBarChart extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 8),
                         child: Text(
                           days[value.toInt()],
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
-                            color: AppTheme.textTertiary,
+                            color: colors.textTertiary,
                           ),
                         ),
                       ),
@@ -371,7 +377,8 @@ class _CategoryDonut extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = <Color>[
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+    final chartColors = <Color>[
       AppTheme.primary,
       AppTheme.indigo,
       AppTheme.sky,
@@ -390,18 +397,18 @@ class _CategoryDonut extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Task Distribution',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
-              color: AppTheme.textPrimary,
+              color: colors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             'By category',
-            style: TextStyle(fontSize: 13, color: AppTheme.textTertiary),
+            style: TextStyle(fontSize: 13, color: colors.textTertiary),
           ),
           const SizedBox(height: 24),
           SizedBox(
@@ -425,7 +432,7 @@ class _CategoryDonut extends StatelessWidget {
                             final entry = e.value;
                             return PieChartSectionData(
                               value: entry.value.toDouble(),
-                              color: colors[idx % colors.length],
+                              color: chartColors[idx % chartColors.length],
                               radius: 30,
                               showTitle: false,
                             );
@@ -439,18 +446,18 @@ class _CategoryDonut extends StatelessWidget {
                   children: [
                     Text(
                       '$total',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.textPrimary,
+                        color: colors.textPrimary,
                       ),
                     ),
-                    const Text(
+                    Text(
                       'TOTAL',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.textTertiary,
+                        color: colors.textTertiary,
                         letterSpacing: 2,
                       ),
                     ),
@@ -476,23 +483,23 @@ class _CategoryDonut extends StatelessWidget {
                         height: 12,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: colors[idx % colors.length],
+                          color: chartColors[idx % chartColors.length],
                         ),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         entry.key,
-                        style: const TextStyle(
-                            fontSize: 13, color: AppTheme.textPrimary),
+                        style: TextStyle(
+                            fontSize: 13, color: colors.textPrimary),
                       ),
                     ],
                   ),
                   Text(
                     '${entry.value}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: colors.textPrimary,
                     ),
                   ),
                 ],
@@ -512,6 +519,8 @@ class _RecentTasksTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+
     return Container(
       decoration: BoxDecoration(
         color: AppTheme.primary.withValues(alpha: 0.05),
@@ -523,18 +532,18 @@ class _RecentTasksTable extends StatelessWidget {
           // Header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: AppTheme.borderDark)),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: colors.border)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Recent Tasks',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
+                    color: colors.textPrimary,
                   ),
                 ),
                 ElevatedButton.icon(
@@ -565,22 +574,22 @@ class _RecentTasksTable extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             child: Row(
               children: [
-                _tableHeader('Task Name', flex: 3),
-                _tableHeader('Category', flex: 2),
-                _tableHeader('Duration', flex: 1),
-                _tableHeader('Status', flex: 1),
-                _tableHeader('Date', flex: 1, alignment: CrossAxisAlignment.end),
+                _tableHeader('Task Name', flex: 3, colors: colors),
+                _tableHeader('Category', flex: 2, colors: colors),
+                _tableHeader('Duration', flex: 1, colors: colors),
+                _tableHeader('Status', flex: 1, colors: colors),
+                _tableHeader('Date', flex: 1, alignment: CrossAxisAlignment.end, colors: colors),
               ],
             ),
           ),
-          const Divider(color: AppTheme.borderDark, height: 1),
+          Divider(color: colors.border, height: 1),
           // Rows
           if (tasks.isEmpty)
-            const Padding(
-              padding: EdgeInsets.all(32),
+            Padding(
+              padding: const EdgeInsets.all(32),
               child: Text(
                 'No tasks yet. Create your first task!',
-                style: TextStyle(color: AppTheme.textTertiary),
+                style: TextStyle(color: colors.textTertiary),
               ),
             )
           else
@@ -591,7 +600,7 @@ class _RecentTasksTable extends StatelessWidget {
   }
 
   Widget _tableHeader(String text,
-      {int flex = 1, CrossAxisAlignment alignment = CrossAxisAlignment.start}) {
+      {int flex = 1, CrossAxisAlignment alignment = CrossAxisAlignment.start, required AppThemeColors colors}) {
     return Expanded(
       flex: flex,
       child: Align(
@@ -600,10 +609,10 @@ class _RecentTasksTable extends StatelessWidget {
             : Alignment.centerLeft,
         child: Text(
           text.toUpperCase(),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.w600,
-            color: AppTheme.textTertiary,
+            color: colors.textTertiary,
             letterSpacing: 1,
           ),
         ),
@@ -618,6 +627,7 @@ class _TaskRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
     final catColor = AppTheme.getCategoryColor(task.category);
     final statusColor = AppTheme.getStatusColor(task.status);
     const months = [
@@ -627,9 +637,9 @@ class _TaskRow extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(color: AppTheme.borderDark, width: 0.5),
+          bottom: BorderSide(color: colors.border, width: 0.5),
         ),
       ),
       child: Row(
@@ -652,10 +662,10 @@ class _TaskRow extends StatelessWidget {
                 Flexible(
                   child: Text(
                     task.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: AppTheme.textPrimary,
+                      color: colors.textPrimary,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -688,8 +698,8 @@ class _TaskRow extends StatelessWidget {
             flex: 1,
             child: Text(
               task.formattedTimeFriendly,
-              style: const TextStyle(
-                  fontSize: 13, color: AppTheme.textPrimary),
+              style: TextStyle(
+                  fontSize: 13, color: colors.textPrimary),
             ),
           ),
           // Status
@@ -724,9 +734,9 @@ class _TaskRow extends StatelessWidget {
               alignment: Alignment.centerRight,
               child: Text(
                 '${months[task.createdAt.month - 1]} ${task.createdAt.day}, ${task.createdAt.year}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
-                  color: AppTheme.textTertiary,
+                  color: colors.textTertiary,
                 ),
               ),
             ),

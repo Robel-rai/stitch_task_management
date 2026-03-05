@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../theme/app_colors.dart';
 
 class KpiCard extends StatelessWidget {
   final String label;
@@ -21,6 +22,8 @@ class KpiCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -66,19 +69,19 @@ class KpiCard extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: AppTheme.textSecondary,
+              color: colors.textSecondary,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w700,
-              color: AppTheme.textPrimary,
+              color: colors.textPrimary,
             ),
           ),
         ],
