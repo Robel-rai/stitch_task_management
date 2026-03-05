@@ -52,7 +52,7 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
         textSecondary: Color(0xFF94A3B8),
         textTertiary: Color(0xFF64748B),
         sidebarBackground: Color(0x80101022), // 50% opacity
-        navItemActive: Color(0xFF090966),
+        navItemActive: Color(0xFF1f1fba),
         navItemActiveText: Colors.white,
         navItemInactiveText: Color(0xFF94A3B8),
       );
@@ -69,7 +69,7 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
         textSecondary: Color(0xFF64748B),
         textTertiary: Color(0xFF94A3B8),
         sidebarBackground: Color(0xFFFFFFFF),
-        navItemActive: Color(0xFF090966),
+        navItemActive: Color(0xFF1f1fba),
         navItemActiveText: Colors.white,
         navItemInactiveText: Color(0xFF64748B),
       );

@@ -55,6 +55,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+  msix: ^3.16.13
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -96,3 +98,20 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_launcher_icons:
+  image_path: "AppLogo/Task Flow.png"
+  windows:
+    generate: true
+    image_path: "AppLogo/Task Flow.png"
+    icon_size: 256
+
+msix_config:
+  display_name: Task Flow
+  publisher_display_name: Yared
+  identity_name: TaskFlow.App
+  logo_path: AppLogo/Task Flow.png
+  msix_version: 1.0.0.0
+  processor_architecture: x64
+  output_path: "Final Software"
+  output_name: "TaskFlow_Installer"
