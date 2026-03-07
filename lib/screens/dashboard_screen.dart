@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
+import '../models/task.dart';
+import '../database/database.dart';
 import '../providers/app_state.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_colors.dart';
@@ -64,17 +66,93 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           color: AppTheme.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: TextField(
-                          onChanged: state.setSearchQuery,
-                          style: TextStyle(
-                              fontSize: 13, color: colors.textPrimary),
-                          decoration: InputDecoration(
-                            hintText: 'Search activities...',
-                            prefixIcon: Icon(Icons.search,
-                                size: 18, color: colors.textSecondary),
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                          ),
+                        child: Autocomplete<Task>(
+                          optionsBuilder: (TextEditingValue textEditingValue) async {
+                            if (textEditingValue.text.isEmpty) {
+                              return const Iterable<Task>.empty();
+                            }
+                            final allTasks = await AppDatabase.getAllTasks(searchQuery: textEditingValue.text);
+                            return allTasks.take(3);
+                          },
+                          displayStringForOption: (Task option) => option.title,
+                          onSelected: (Task selection) async {
+                            // Clear focus
+                            FocusScope.of(context).unfocus();
+                            // Go to tasks screen
+                            state.setNavIndex(1);
+                            // Set search query to match so it filters there too
+                            state.setSearchQuery(selection.title);
+                            
+                            // Open task dialog on next frame to allow navigation
+                            WidgetsBinding.instance.addPostFrameCallback((_) async {
+                               final result = await showDialog<Task>(
+                                  context: context,
+                                  builder: (_) => TaskDialog(task: selection),
+                               );
+                               if (result != null && context.mounted) {
+                                  context.read<AppState>().updateTask(result);
+                               }
+                            });
+                          },
+                          fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                            return TextField(
+                              controller: controller,
+                              focusNode: focusNode,
+                              onSubmitted: (value) {
+                                state.setSearchQuery(value);
+                                state.setNavIndex(1);
+                              },
+                              style: TextStyle(fontSize: 13, color: colors.textPrimary),
+                              decoration: InputDecoration(
+                                hintText: 'Search activities...',
+                                prefixIcon: Icon(Icons.search, size: 18, color: colors.textSecondary),
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                              ),
+                            );
+                          },
+                          optionsViewBuilder: (context, onSelected, options) {
+                            return Align(
+                              alignment: Alignment.topLeft,
+                              child: Material(
+                                elevation: 4.0,
+                                borderRadius: BorderRadius.circular(10),
+                                color: colors.surface,
+                                child: Container(
+                                  width: 256,
+                                  constraints: const BoxConstraints(maxHeight: 200),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(color: colors.border),
+                                  ),
+                                  child: ListView.builder(
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    shrinkWrap: true,
+                                    itemCount: options.length,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      final Task option = options.elementAt(index);
+                                      return InkWell(
+                                        onTap: () {
+                                          onSelected(option);
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                          child: Text(
+                                            option.title,
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: colors.textPrimary,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(width: 12),

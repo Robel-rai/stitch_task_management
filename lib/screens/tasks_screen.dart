@@ -16,6 +16,22 @@ class TasksScreen extends StatefulWidget {
 
 class _TasksScreenState extends State<TasksScreen> {
   bool _gridView = true;
+  late TextEditingController _searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize with current query to handle routing from Dashboard
+    _searchController = TextEditingController(
+      text: context.read<AppState>().searchQuery,
+    );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +39,17 @@ class _TasksScreenState extends State<TasksScreen> {
 
     return Consumer<AppState>(
       builder: (context, state, _) {
+        // Sync controller with state if updated externally (like from Dashboard)
+        if (_searchController.text != state.searchQuery) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (_searchController.text != state.searchQuery) {
+              _searchController.value = _searchController.value.copyWith(
+                text: state.searchQuery,
+                selection: TextSelection.collapsed(offset: state.searchQuery.length),
+              );
+            }
+          });
+        }
         return Row(
           children: [
             // Main task area
@@ -56,6 +83,7 @@ class _TasksScreenState extends State<TasksScreen> {
                             constraints: const BoxConstraints(maxWidth: 400),
                             height: 36,
                             child: TextField(
+                              controller: _searchController,
                               onChanged: state.setSearchQuery,
                               style: TextStyle(
                                   fontSize: 13, color: colors.textPrimary),
@@ -107,19 +135,19 @@ class _TasksScreenState extends State<TasksScreen> {
                             _FilterChip(
                               label: 'Category',
                               icon: Icons.expand_more,
-                              onTap: () => _showCategoryFilter(context, state),
+                              onTap: (ctx) => _showCategoryFilter(ctx, state),
                             ),
                             const SizedBox(width: 12),
                             _FilterChip(
                               label: 'Status',
                               icon: Icons.expand_more,
-                              onTap: () => _showStatusFilter(context, state),
+                              onTap: (ctx) => _showStatusFilter(ctx, state),
                             ),
                             const SizedBox(width: 12),
                             _FilterChip(
                               label: 'Priority',
                               icon: Icons.expand_more,
-                              onTap: () => _showPriorityFilter(context, state),
+                              onTap: (ctx) => _showPriorityFilter(ctx, state),
                             ),
                             if (state.categoryFilter != null ||
                                 state.statusFilter != null ||
@@ -326,13 +354,32 @@ class _TasksScreenState extends State<TasksScreen> {
       BuildContext context, List<String> items, ValueChanged<String> onSelect) {
     final colors = Theme.of(context).extension<AppThemeColors>()!;
     final RenderBox button = context.findRenderObject() as RenderBox;
-    final offset = button.localToGlobal(Offset.zero);
+    final RenderBox overlay = Navigator.of(context).overlay!.context.findRenderObject() as RenderBox;
+    
+    // Calculate position exactly below the button
+    final RelativeRect position = RelativeRect.fromRect(
+      Rect.fromPoints(
+        button.localToGlobal(Offset(0, button.size.height + 4), ancestor: overlay),
+        button.localToGlobal(button.size.bottomRight(const Offset(0, 4)), ancestor: overlay),
+      ),
+      Offset.zero & overlay.size,
+    );
+
     showMenu<String>(
       context: context,
-      position: RelativeRect.fromLTRB(offset.dx, offset.dy + 40, 0, 0),
+      position: position,
       color: colors.surfaceVariant,
+      constraints: BoxConstraints(minWidth: button.size.width),
       items: items
-          .map((e) => PopupMenuItem(value: e, child: Text(e)))
+          .map((e) => PopupMenuItem(
+                value: e,
+                textStyle: TextStyle(
+                  color: colors.textPrimary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+                child: Text(e),
+              ))
           .toList(),
     ).then((value) {
       if (value != null) onSelect(value);
@@ -343,7 +390,7 @@ class _TasksScreenState extends State<TasksScreen> {
 class _FilterChip extends StatelessWidget {
   final String label;
   final IconData icon;
-  final VoidCallback onTap;
+  final void Function(BuildContext) onTap;
 
   const _FilterChip({
     required this.label,
@@ -359,7 +406,7 @@ class _FilterChip extends StatelessWidget {
       color: colors.surfaceVariant,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
-        onTap: onTap,
+        onTap: () => onTap(context),
         borderRadius: BorderRadius.circular(8),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
