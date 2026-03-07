@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:windows_notification/notification_message.dart';
+import 'package:windows_notification/windows_notification.dart';
 import '../database/database.dart';
 
 /// Notification system using in-app snackbars and checking for unfinished tasks.
 class NotificationService {
+  static final WindowsNotification _winNotifyPlugin = WindowsNotification(applicationId: "TaskFlow.App");
+  static BuildContext? _appContext;
+
+  /// Call this when app initializes so we have a context for dialogs if needed
+  static void setContext(BuildContext context) {
+    _appContext = context;
+  }
   /// Check for unfinished tasks and show reminder
   static Future<void> checkUnfinishedTasks(BuildContext context) async {
     final pending = await AppDatabase.getPendingTaskCount();
@@ -32,7 +41,6 @@ class NotificationService {
     }
   }
 
-  /// Daily summary notification
   static Future<void> showDailySummary(BuildContext context) async {
     final today = await AppDatabase.getCompletedTasksToday();
     final hours = await AppDatabase.getTotalHoursLogged();
@@ -45,6 +53,37 @@ class NotificationService {
             'Completed $today tasks today. Total ${hours.toStringAsFixed(1)}h logged.',
         color: const Color(0xFF0D0DF2),
       );
+    }
+  }
+
+  /// Break reminder for 2+ hours continuous work
+  static Future<void> showBreakReminder(bool isVisible, String taskName) async {
+    final title = 'Time to take a break!';
+    final body = 'You\'ve been working on "$taskName" for over 2 hours continuously. Please rest your eyes and stretch!';
+
+    if (isVisible && _appContext != null) {
+      // Show in-app dialog
+      showDialog(
+        context: _appContext!,
+        builder: (ctx) => AlertDialog(
+          title: Text(title),
+          content: Text(body),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Got it'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      // Show Windows system notification
+      NotificationMessage message = NotificationMessage.fromPluginTemplate(
+        "task_break",
+        title,
+        body,
+      );
+      _winNotifyPlugin.showNotificationPluginTemplate(message);
     }
   }
 

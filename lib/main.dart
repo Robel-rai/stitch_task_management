@@ -7,6 +7,7 @@ import 'screens/tasks_screen.dart';
 import 'screens/calendar_screen.dart';
 import 'screens/analytics_screen.dart';
 import 'screens/settings_screen.dart';
+import 'services/notification_service.dart';
 import 'theme/app_theme.dart';
 import 'widgets/sidebar.dart';
 
@@ -44,6 +45,9 @@ class AppShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Provide a valid navigator context to NotificationService for in-app dialogs
+    NotificationService.setContext(context);
+
     return Scaffold(
       body: Row(
         children: [

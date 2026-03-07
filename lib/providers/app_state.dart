@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../database/database.dart';
 import '../models/task.dart';
+import '../services/notification_service.dart';
 
 /// Global application state managed by ChangeNotifier.
 /// All views listen to this for data changes.
-class AppState extends ChangeNotifier {
+class AppState extends ChangeNotifier with WidgetsBindingObserver {
   // ─── Theme ───
   bool _isDarkMode = true;
   bool get isDarkMode => _isDarkMode;
@@ -64,6 +65,10 @@ class AppState extends ChangeNotifier {
   List<Task> _recentTasks = [];
   List<Task> get recentTasks => _recentTasks;
 
+  // ─── Lifecycle & Notifications ───
+  bool _isAppVisible = true;
+  final Set<int> _notifiedTaskIds = {}; // keeps track of tasks that triggered break reminder
+
   // ─── Timer ───
   Timer? _timerUpdateTimer;
 
@@ -100,20 +105,49 @@ class AppState extends ChangeNotifier {
     _isDarkMode = prefs.getBool('isDarkMode') ?? true;
     
     await refreshAll();
+    // Register lifecycle observer
+    WidgetsBinding.instance.addObserver(this);
+    
     // Start periodic timer updates for running timers
     _timerUpdateTimer = Timer.periodic(
       const Duration(seconds: 1),
       (_) {
-        final hasRunning = _tasks.any((t) => t.isTimerRunning);
-        if (hasRunning) {
+        final runningTasks = _tasks.where((t) => t.isTimerRunning);
+        if (runningTasks.isNotEmpty) {
           notifyListeners();
+          
+          // Check for break reminder
+          for (final task in runningTasks) {
+            if (task.id == null) continue;
+            final totalElapsed = task.timeSpentSeconds + 
+                DateTime.now().difference(task.timerStartedAt!).inSeconds;
+            
+            // 7200 seconds = 2 hours
+            if (totalElapsed >= 7200 && !_notifiedTaskIds.contains(task.id)) {
+              _notifiedTaskIds.add(task.id!);
+              NotificationService.showBreakReminder(
+                _isAppVisible,
+                task.title,
+              );
+            }
+          }
         }
       },
     );
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _isAppVisible = true;
+    } else if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+      _isAppVisible = false;
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _timerUpdateTimer?.cancel();
     super.dispose();
   }
