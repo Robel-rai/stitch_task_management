@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
 import '../theme/app_theme.dart';
@@ -36,9 +35,11 @@ class Sidebar extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       clipBehavior: Clip.antiAlias,
-                      child: SvgPicture.asset(
-                        'AppLogo/Task Flow.svg',
+                      child: Image.asset(
+                        'AppLogo/Task Flow.png',
                         fit: BoxFit.contain,
+                        // Ensure high quality rendering for the logo
+                        filterQuality: FilterQuality.high,
                       ),
                     ),
                     const SizedBox(width: 12),

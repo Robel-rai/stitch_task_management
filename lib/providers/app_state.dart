@@ -233,13 +233,16 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     await refreshAll();
   }
 
-  Future<void> toggleTaskStatus(Task task) async {
+  Future<void> toggleTaskStatus(Task task, {bool resumeTimer = false}) async {
     Task updated;
     if (task.status == 'Completed') {
       updated = task.copyWith(
-        status: 'Pending',
+        status: resumeTimer ? 'In Progress' : 'Pending',
         clearCompletedAt: true,
       );
+      if (resumeTimer) {
+        updated = updated.copyWith(timerStartedAt: DateTime.now());
+      }
     } else {
       updated = task.copyWith(
         status: 'Completed',

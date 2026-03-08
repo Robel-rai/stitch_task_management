@@ -187,7 +187,17 @@ class TaskCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                _TimerButton(task: task),
+                  Row(
+                    children: [
+                      _CompleteButton(task: task),
+                      const SizedBox(width: 8),
+                      _DeleteButton(task: task),
+                      if (task.status != 'Completed') ...[
+                        const SizedBox(width: 8),
+                        _TimerButton(task: task),
+                      ],
+                    ],
+                  ),
               ],
             ),
           ),
@@ -220,17 +230,6 @@ class _TimerButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<AppThemeColors>()!;
 
-    if (task.status == 'Completed') {
-      return Container(
-        width: 40,
-        height: 40,
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-          color: AppTheme.emerald,
-        ),
-        child: const Icon(Icons.check, color: Colors.white, size: 20),
-      );
-    }
 
     final isRunning = task.isTimerRunning;
     return GestureDetector(
@@ -260,6 +259,128 @@ class _TimerButton extends StatelessWidget {
           size: 20,
         ),
       ),
+    );
+  }
+}
+
+class _HoverActionIcon extends StatefulWidget {
+  final IconData icon;
+  final Color baseColor;
+  final bool isSticky;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  const _HoverActionIcon({
+    required this.icon,
+    required this.baseColor,
+    this.isSticky = false,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  @override
+  State<_HoverActionIcon> createState() => _HoverActionIconState();
+}
+
+class _HoverActionIconState extends State<_HoverActionIcon> {
+  bool _isHovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    // Transparency mapping: 90% default (0.1 opacity), 40% hover (0.6 opacity), 0% sticky/clicked (1.0 opacity)
+    double currentOpacity = 0.1;
+    if (widget.isSticky) {
+      currentOpacity = 1.0;
+    } else if (_isHovering) {
+      currentOpacity = 0.6;
+    }
+
+    return Tooltip(
+      message: widget.tooltip,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovering = true),
+        onExit: (_) => setState(() => _isHovering = false),
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 150),
+            opacity: currentOpacity,
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: widget.baseColor.withValues(alpha: 0.15),
+              ),
+              child: Icon(
+                widget.icon,
+                color: widget.baseColor,
+                size: 16,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DeleteButton extends StatelessWidget {
+  final Task task;
+  const _DeleteButton({required this.task});
+
+  @override
+  Widget build(BuildContext context) {
+    return _HoverActionIcon(
+      icon: Icons.close,
+      baseColor: AppTheme.rose,
+      tooltip: 'Delete Task',
+      onTap: () async {
+        final colors = Theme.of(context).extension<AppThemeColors>()!;
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            backgroundColor: colors.surface,
+            title: const Text('Delete Task'),
+            content: const Text('Are you sure you want to delete this task? There is no way to undo this action.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text('No', style: TextStyle(color: colors.textSecondary)),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                style: ElevatedButton.styleFrom(backgroundColor: AppTheme.rose),
+                child: const Text('Yes'),
+              ),
+            ],
+          ),
+        );
+        if (confirmed == true && context.mounted && task.id != null) {
+          context.read<AppState>().deleteTask(task.id!);
+        }
+      },
+    );
+  }
+}
+
+class _CompleteButton extends StatelessWidget {
+  final Task task;
+  const _CompleteButton({required this.task});
+
+  @override
+  Widget build(BuildContext context) {
+    final isCompleted = task.status == 'Completed';
+
+    return _HoverActionIcon(
+      icon: Icons.check,
+      baseColor: AppTheme.emerald,
+      isSticky: isCompleted,
+      tooltip: isCompleted ? 'Uncomplete Task' : 'Complete Task',
+      onTap: () {
+        // When uncompleting, automatically resume the timer to act fluidly
+        context.read<AppState>().toggleTaskStatus(task, resumeTimer: true);
+      },
     );
   }
 }
