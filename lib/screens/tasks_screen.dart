@@ -255,7 +255,7 @@ class _TasksScreenState extends State<TasksScreen> {
           crossAxisCount: 3,
           crossAxisSpacing: 24,
           mainAxisSpacing: 24,
-          childAspectRatio: 0.95,
+          childAspectRatio: 0.80, // Reduced aspect ratio to accommodate extra action buttons height
         ),
         itemCount: state.tasks.length,
         itemBuilder: (context, index) {

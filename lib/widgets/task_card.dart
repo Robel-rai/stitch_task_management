@@ -187,15 +187,22 @@ class TaskCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                  Row(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      _CompleteButton(task: task),
-                      const SizedBox(width: 8),
-                      _DeleteButton(task: task),
                       if (task.status != 'Completed') ...[
-                        const SizedBox(width: 8),
                         _TimerButton(task: task),
+                        const SizedBox(height: 8),
                       ],
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _CompleteButton(task: task),
+                          const SizedBox(width: 8),
+                          _DeleteButton(task: task),
+                        ],
+                      ),
                     ],
                   ),
               ],
@@ -287,8 +294,8 @@ class _HoverActionIconState extends State<_HoverActionIcon> {
 
   @override
   Widget build(BuildContext context) {
-    // Transparency mapping: 90% default (0.1 opacity), 40% hover (0.6 opacity), 0% sticky/clicked (1.0 opacity)
-    double currentOpacity = 0.1;
+    // Transparency mapping: 60% transparent default (0.4 opacity), 40% transparent hover (0.6 opacity), 0% sticky/clicked (1.0 opacity)
+    double currentOpacity = 0.4;
     if (widget.isSticky) {
       currentOpacity = 1.0;
     } else if (_isHovering) {
