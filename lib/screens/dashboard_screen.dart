@@ -159,9 +159,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       // Notification bell
                       _HeaderIconButton(
                         icon: Icons.notifications_outlined,
-                        badge: state.pendingTasks > 0,
-                        onTap: () =>
-                            NotificationService.showDailySummary(context),
+                        badge: state.notificationTasks.isNotEmpty,
+                        onTap: (buttonContext) {
+                          _showNotificationMenu(buttonContext, state);
+                        },
                       ),
                     ],
                   ),
@@ -259,12 +260,99 @@ class _DashboardScreenState extends State<DashboardScreen> {
       },
     );
   }
+
+  void _showNotificationMenu(BuildContext context, AppState state) {
+    if (state.notificationTasks.isEmpty) {
+      NotificationService.showDailySummary(context);
+      return;
+    }
+
+    final RenderBox button = context.findRenderObject() as RenderBox;
+    final RenderBox overlay = Navigator.of(context).overlay!.context.findRenderObject() as RenderBox;
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+    
+    final RelativeRect position = RelativeRect.fromRect(
+      Rect.fromPoints(
+        button.localToGlobal(Offset(0, button.size.height + 4), ancestor: overlay),
+        button.localToGlobal(button.size.bottomRight(const Offset(0, 4)), ancestor: overlay),
+      ),
+      Offset.zero & overlay.size,
+    );
+
+    showMenu<Task>(
+      context: context,
+      position: position,
+      color: colors.surfaceVariant,
+      constraints: const BoxConstraints(minWidth: 250, maxWidth: 350),
+      items: state.notificationTasks.map((task) {
+        final elapsed = task.timeSpentSeconds + 
+            (task.timerStartedAt != null ? DateTime.now().difference(task.timerStartedAt!).inSeconds : 0);
+        final isAlert = elapsed >= 7200;
+
+        return PopupMenuItem<Task>(
+          value: task,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                isAlert ? Icons.warning_amber_rounded : Icons.timer,
+                color: isAlert ? AppTheme.rose : AppTheme.primary,
+                size: 20,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      task.title,
+                      style: TextStyle(
+                        color: colors.textPrimary,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      isAlert ? 'Running for over 2 hours!' : 'Timer running',
+                      style: TextStyle(
+                        color: isAlert ? AppTheme.rose : colors.textTertiary,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    ).then((selectedTask) {
+      if (selectedTask != null) {
+        // Navigate to Tasks Page
+        state.setNavIndex(1);
+        
+        // Open the dialog after navigation
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          final result = await showDialog<Task>(
+            context: context,
+            builder: (_) => TaskDialog(task: selectedTask),
+          );
+          if (result != null && context.mounted) {
+            context.read<AppState>().updateTask(result);
+          }
+        });
+      }
+    });
+  }
 }
 
 class _HeaderIconButton extends StatelessWidget {
   final IconData icon;
   final bool badge;
-  final VoidCallback onTap;
+  final void Function(BuildContext) onTap;
 
   const _HeaderIconButton({
     required this.icon,
@@ -282,7 +370,7 @@ class _HeaderIconButton extends StatelessWidget {
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(10),
           child: InkWell(
-            onTap: onTap,
+            onTap: () => onTap(context),
             borderRadius: BorderRadius.circular(10),
             child: Container(
               padding: const EdgeInsets.all(8),

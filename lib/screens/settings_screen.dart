@@ -310,7 +310,7 @@ class SettingsScreen extends StatelessWidget {
                         children: [
                           _infoRow('App Name', 'Taskflow', colors),
                           Divider(color: colors.border, height: 24),
-                          _infoRow('Version', '1.0.0', colors),
+                          _infoRow('Version', '1.2.0', colors),
                           Divider(color: colors.border, height: 24),
                           _infoRow('Platform', 'Windows Desktop', colors),
                         ],

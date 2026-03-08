@@ -69,6 +69,8 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   bool _isAppVisible = true;
   final Set<int> _notifiedTaskIds = {}; // keeps track of tasks that triggered break reminder
 
+  List<Task> get notificationTasks => _tasks.where((t) => t.isTimerRunning).toList();
+
   // ─── Timer ───
   Timer? _timerUpdateTimer;
 
