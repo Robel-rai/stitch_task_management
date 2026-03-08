@@ -8,6 +8,8 @@ import '../theme/app_theme.dart';
 import '../theme/app_colors.dart';
 import '../widgets/task_dialog.dart';
 
+enum CalendarViewMode { month, week, day }
+
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
 
@@ -17,6 +19,7 @@ class CalendarScreen extends StatefulWidget {
 
 class _CalendarScreenState extends State<CalendarScreen> {
   Map<String, List<Task>> _monthTasks = {};
+  CalendarViewMode _viewMode = CalendarViewMode.month;
 
   @override
   void initState() {
@@ -151,9 +154,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               ),
                               child: Row(
                                 children: [
-                                  _viewBtn('Month', true, colors),
-                                  _viewBtn('Week', false, colors),
-                                  _viewBtn('Day', false, colors),
+                                  _viewBtn('Month', CalendarViewMode.month, colors),
+                                  _viewBtn('Week', CalendarViewMode.week, colors),
+                                  _viewBtn('Day', CalendarViewMode.day, colors),
                                 ],
                               ),
                             ),
@@ -186,27 +189,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: colors.border),
                       ),
-                      child: Column(
-                        children: [
-                          // Day headers
-                          _DayHeaders(),
-                          // Grid
-                          Expanded(
-                            child: _CalendarGrid(
-                              month: month,
-                              monthTasks: _monthTasks,
-                              selectedDate: state.selectedCalendarDate,
-                              onDateSelected: (date) async {
-                                await state.selectCalendarDate(date);
-                              },
-                              onTaskDropped: (taskId, newDate) async {
-                                await state.rescheduleTask(taskId, newDate);
-                                await _loadMonthTasks();
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
+                      child: _buildCurrentView(month, state),
                     ),
                   ),
                 ],
@@ -226,22 +209,78 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  Widget _viewBtn(String label, bool active, AppThemeColors colors) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      decoration: BoxDecoration(
-        color: active ? colors.surface : Colors.transparent,
-        borderRadius: BorderRadius.circular(6),
-        boxShadow: active
-            ? [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4)]
-            : null,
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-          color: active ? colors.textPrimary : colors.textTertiary,
+  Widget _buildCurrentView(DateTime month, AppState state) {
+    switch (_viewMode) {
+      case CalendarViewMode.month:
+        return Column(
+          children: [
+            const _DayHeaders(startOnMonday: false),
+            Expanded(
+              child: _CalendarGrid(
+                month: month,
+                monthTasks: _monthTasks,
+                selectedDate: state.selectedCalendarDate,
+                onDateSelected: (date) async {
+                  await state.selectCalendarDate(date);
+                },
+                onTaskDropped: (taskId, newDate) async {
+                  await state.rescheduleTask(taskId, newDate);
+                  await _loadMonthTasks();
+                },
+              ),
+            ),
+          ],
+        );
+      case CalendarViewMode.week:
+        return Column(
+          children: [
+            const _DayHeaders(startOnMonday: true),
+            Expanded(
+              child: _WeekViewGrid(
+                month: month,
+                monthTasks: _monthTasks,
+                selectedDate: state.selectedCalendarDate,
+                onDateSelected: (date) async {
+                  await state.selectCalendarDate(date);
+                },
+                onTaskDropped: (taskId, newDate) async {
+                  await state.rescheduleTask(taskId, newDate);
+                  await _loadMonthTasks();
+                },
+              ),
+            ),
+          ],
+        );
+      case CalendarViewMode.day:
+        return _DayViewList(
+          date: state.selectedCalendarDate,
+          tasks: state.selectedDayTasks,
+          onReorder: state.reorderDayTasks,
+        );
+    }
+  }
+
+  Widget _viewBtn(String label, CalendarViewMode mode, AppThemeColors colors) {
+    final active = _viewMode == mode;
+    return InkWell(
+      onTap: () => setState(() => _viewMode = mode),
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        decoration: BoxDecoration(
+          color: active ? colors.surface : Colors.transparent,
+          borderRadius: BorderRadius.circular(6),
+          boxShadow: active
+              ? [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4)]
+              : null,
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+            color: active ? colors.textPrimary : colors.textTertiary,
+          ),
         ),
       ),
     );
@@ -266,10 +305,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
 }
 
 class _DayHeaders extends StatelessWidget {
+  final bool startOnMonday;
+  const _DayHeaders({this.startOnMonday = false});
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<AppThemeColors>()!;
-    const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+    final days = startOnMonday
+        ? const ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+        : const ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
     return Container(
       decoration: BoxDecoration(
         color: colors.surfaceVariant.withValues(alpha: 0.5),
@@ -782,8 +826,6 @@ class _DayTaskCard extends StatelessWidget {
                   ),
                 ),
               ),
-              Icon(Icons.drag_indicator,
-                  size: 18, color: colors.textTertiary),
             ],
           ),
           const SizedBox(height: 10),
@@ -824,6 +866,207 @@ class _DayTaskCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _WeekViewGrid extends StatelessWidget {
+  final DateTime month;
+  final Map<String, List<Task>> monthTasks;
+  final DateTime selectedDate;
+  final ValueChanged<DateTime> onDateSelected;
+  final Function(int taskId, DateTime newDate) onTaskDropped;
+
+  const _WeekViewGrid({
+    required this.month,
+    required this.monthTasks,
+    required this.selectedDate,
+    required this.onDateSelected,
+    required this.onTaskDropped,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+    int currentWeekday = selectedDate.weekday; // 1 = Monday, 7 = Sunday
+    DateTime startOfWeek = selectedDate.subtract(Duration(days: currentWeekday - 1));
+
+    return Row(
+      children: List.generate(7, (index) {
+        final date = startOfWeek.add(Duration(days: index));
+        final dateStr = DateFormat('yyyy-MM-dd').format(date);
+        
+        final tasks = (monthTasks[dateStr] ?? []).toList();
+        tasks.sort((a, b) => (a.scheduledDate ?? DateTime.now()).compareTo(b.scheduledDate ?? DateTime.now()));
+
+        final now = DateTime.now();
+        final isToday = date.year == now.year && date.month == now.month && date.day == now.day;
+        final isSelected = date.year == selectedDate.year && date.month == selectedDate.month && date.day == selectedDate.day;
+
+        return Expanded(
+          child: DragTarget<int>(
+            onAcceptWithDetails: (details) {
+              onTaskDropped(details.data, date);
+            },
+            builder: (context, candidateData, rejectedData) {
+              return GestureDetector(
+                onTap: () => onDateSelected(date),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isSelected 
+                        ? AppTheme.primary.withValues(alpha: 0.1) 
+                        : (candidateData.isNotEmpty ? AppTheme.primary.withValues(alpha: 0.05) : Colors.transparent),
+                    border: Border(right: BorderSide(color: colors.border, width: 0.5)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isSelected ? AppTheme.primary.withValues(alpha: 0.1) : Colors.transparent,
+                          border: Border(bottom: BorderSide(color: colors.border, width: 0.5)),
+                        ),
+                        child: Text(
+                          '${date.day}',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: isToday ? FontWeight.w700 : FontWeight.w500,
+                            color: isToday ? AppTheme.primary : colors.textPrimary,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          padding: const EdgeInsets.all(8),
+                          itemCount: tasks.length,
+                          itemBuilder: (context, taskIndex) {
+                            final t = tasks[taskIndex];
+                            final timeStr = t.scheduledDate != null ? DateFormat('HH:mm').format(t.scheduledDate!) : '';
+                            return Draggable<int>(
+                              data: t.id,
+                              feedback: Material(
+                                color: Colors.transparent,
+                                child: Container(
+                                  width: 150,
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.getCategoryColor(t.category),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(t.title, style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold)),
+                                ),
+                              ),
+                              childWhenDragging: Opacity(
+                                opacity: 0.3,
+                                child: _WeekTaskCard(task: t, timeStr: timeStr),
+                              ),
+                              child: _WeekTaskCard(task: t, timeStr: timeStr),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      }),
+    );
+  }
+}
+
+class _WeekTaskCard extends StatelessWidget {
+  final Task task;
+  final String timeStr;
+  const _WeekTaskCard({required this.task, required this.timeStr});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+    final catColor = AppTheme.getCategoryColor(task.category);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: catColor.withValues(alpha: 0.15),
+        border: Border(left: BorderSide(color: catColor, width: 3)),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (timeStr.isNotEmpty)
+            Text(timeStr, style: TextStyle(fontSize: 9, color: colors.textSecondary, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 2),
+          Text(task.title, style: TextStyle(fontSize: 11, color: colors.textPrimary, fontWeight: FontWeight.bold), maxLines: 2, overflow: TextOverflow.ellipsis),
+        ],
+      ),
+    );
+  }
+}
+
+class _DayViewList extends StatelessWidget {
+  final DateTime date;
+  final List<Task> tasks;
+  final void Function(int oldIndex, int newIndex) onReorder;
+
+  const _DayViewList({
+    required this.date,
+    required this.tasks,
+    required this.onReorder,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+    final dateStr = DateFormat('EEEE, MMMM d, yyyy').format(date);
+    
+    final sortedTasks = tasks.toList();
+    sortedTasks.sort((a,b) => (a.scheduledDate ?? DateTime.now()).compareTo(b.scheduledDate ?? DateTime.now()));
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: colors.border)),
+          ),
+          child: Text(
+            dateStr,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: colors.textPrimary,
+            ),
+          ),
+        ),
+        Expanded(
+          child: ReorderableListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: sortedTasks.length,
+            onReorder: onReorder,
+            proxyDecorator: (child, index, animation) {
+              return Material(
+                color: Colors.transparent,
+                child: child,
+              );
+            },
+            itemBuilder: (context, index) {
+              final task = sortedTasks[index];
+              return Container(
+                key: ValueKey(task.id),
+                margin: const EdgeInsets.only(bottom: 12),
+                child: _DayTaskCard(task: task),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:csv/csv.dart';
 import '../database/database.dart';
 import '../models/task.dart';
 
@@ -47,6 +48,50 @@ class ReportingService {
       return result;
     }
     return null;
+  }
+
+  /// Import tasks from CSV
+  static Future<List<Task>?> importTasksFromCSV() async {
+    final result = await FilePicker.platform.pickFiles(
+      dialogTitle: 'Select Tasks CSV Export',
+      type: FileType.custom,
+      allowedExtensions: ['csv'],
+    );
+
+    if (result == null || result.files.single.path == null) return null;
+
+    final file = File(result.files.single.path!);
+    final contents = await file.readAsString();
+    final fields = const CsvToListConverter().convert(contents);
+
+    if (fields.isEmpty || fields.length < 2) return [];
+
+    final tasks = <Task>[];
+    // Start from row index 1 to skip headers
+    for (int i = 1; i < fields.length; i++) {
+      final row = fields[i];
+      if (row.length < 10) continue; // safety check
+
+      tasks.add(Task(
+        id: int.tryParse(row[0].toString()),
+        title: row[1]?.toString() ?? '',
+        description: row[2]?.toString() ?? '',
+        category: row[3]?.toString() ?? 'General',
+        priority: row[4]?.toString() ?? 'Medium',
+        status: row[5]?.toString() ?? 'Pending',
+        scheduledDate: row[6] != null && row[6].toString().isNotEmpty
+            ? DateTime.tryParse(row[6].toString())
+            : null,
+        createdAt: row[7] != null && row[7].toString().isNotEmpty
+            ? DateTime.tryParse(row[7].toString())
+            : null,
+        completedAt: row[8] != null && row[8].toString().isNotEmpty
+            ? DateTime.tryParse(row[8].toString())
+            : null,
+        timeSpentSeconds: int.tryParse(row[9].toString()) ?? 0,
+      ));
+    }
+    return tasks;
   }
 
   /// Export analytics summary to CSV

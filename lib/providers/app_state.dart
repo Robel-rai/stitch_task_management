@@ -233,6 +233,22 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     await refreshAll();
   }
 
+  Future<List<Task>> syncTasksFromCSV(List<Task> importedTasks) async {
+    final existingTasks = await AppDatabase.getAllTasks();
+    final existingIds = existingTasks.map((t) => t.id).toSet();
+    
+    final newTasks = <Task>[];
+    for (final task in importedTasks) {
+      if (task.id != null && existingIds.contains(task.id)) {
+        await AppDatabase.updateTask(task);
+      } else {
+        newTasks.add(task);
+      }
+    }
+    await refreshAll();
+    return newTasks;
+  }
+
   Future<void> toggleTaskStatus(Task task, {bool resumeTimer = false}) async {
     Task updated;
     if (task.status == 'Completed') {

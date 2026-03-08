@@ -119,14 +119,17 @@ class TaskCard extends StatelessWidget {
                   children: [
                     Icon(Icons.schedule, size: 14, color: colors.textTertiary),
                     const SizedBox(width: 4),
-                    Text(
-                      task.isTimerRunning
-                          ? _formatLive(task.currentTimeSpentSeconds)
-                          : task.formattedTimeSpent,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: colors.textTertiary,
+                    Flexible(
+                      child: Text(
+                        task.isTimerRunning
+                            ? _formatLive(task.currentTimeSpentSeconds)
+                            : task.formattedTimeSpent,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: colors.textTertiary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],

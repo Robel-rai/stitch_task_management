@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../services/analytics_service.dart';
 import '../services/reporting_service.dart';
+import '../providers/app_state.dart';
+import '../models/task.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_colors.dart';
 
@@ -618,17 +621,24 @@ class _ExportSection extends StatelessWidget {
           child: Column(
             children: [
               _ExportItem(
-                icon: Icons.description,
+                icon: Icons.upload_file,
                 iconColor: AppTheme.blue,
-                title: 'Monthly Summary',
-                subtitle: 'PDF Document',
-                downloadColor: AppTheme.primary,
+                title: 'Upload Raw Task Data',
+                subtitle: 'CSV Spreadsheet',
+                downloadColor: AppTheme.blue,
                 onDownload: () async {
-                  final path = await ReportingService.exportAnalyticsToCSV();
-                  if (context.mounted && path != null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Exported to $path')),
-                    );
+                  final tasks = await ReportingService.importTasksFromCSV();
+                  if (context.mounted && tasks != null) {
+                    final appState = context.read<AppState>();
+                    final newTasks = await appState.syncTasksFromCSV(tasks);
+                    
+                    if (newTasks.isNotEmpty) {
+                      _showNewTasksDialog(context, newTasks, appState);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('All tasks synced successfully!')),
+                      );
+                    }
                   }
                 },
               ),
@@ -989,5 +999,55 @@ class _WeeklyReportPreview extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+Future<void> _showNewTasksDialog(
+    BuildContext context, List<Task> newTasks, AppState appState) async {
+  final colors = Theme.of(context).extension<AppThemeColors>()!;
+  final result = await showDialog<bool>(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        backgroundColor: colors.surface,
+        title: Text('New Tasks Detected',
+            style: TextStyle(color: colors.textPrimary)),
+        content: Text(
+            'Found ${newTasks.length} new tasks in the CSV that do not exist locally. Do you want to sync them and create new entries?',
+            style: TextStyle(color: colors.textSecondary)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('No'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primary,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Yes'),
+          ),
+        ],
+      );
+    },
+  );
+
+  if (result == true) {
+    for (var task in newTasks) {
+      await appState.createTask(task);
+    }
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('New tasks synced successfully!')),
+      );
+    }
+  } else {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Existing tasks updated. New tasks were ignored.')),
+      );
+    }
   }
 }
