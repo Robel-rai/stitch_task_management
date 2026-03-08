@@ -104,13 +104,15 @@ class _TasksScreenState extends State<TasksScreen> {
                           ),
                         ),
                         const Spacer(),
-                        IconButton(
-                          onPressed: () => _showNotificationMenu(context, state),
-                          icon: Badge(
-                            isLabelVisible: state.notificationTasks.isNotEmpty,
-                            smallSize: 8,
-                            backgroundColor: AppTheme.rose,
-                            child: Icon(Icons.notifications_outlined, color: colors.textSecondary),
+                        Builder(
+                          builder: (btnContext) => IconButton(
+                            onPressed: () => _showNotificationMenu(btnContext, state),
+                            icon: Badge(
+                              isLabelVisible: state.notificationTasks.isNotEmpty,
+                              smallSize: 8,
+                              backgroundColor: AppTheme.rose,
+                              child: Icon(Icons.notifications_outlined, color: colors.textSecondary),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -303,11 +305,12 @@ class _TasksScreenState extends State<TasksScreen> {
     final RenderBox overlay = Navigator.of(context).overlay!.context.findRenderObject() as RenderBox;
     final colors = Theme.of(context).extension<AppThemeColors>()!;
     
-    // Position menu under top right portion
+    // Align right edge of menu with right edge of button
+    // menu width is 300.
     final RelativeRect position = RelativeRect.fromRect(
       Rect.fromPoints(
-        button.localToGlobal(Offset(button.size.width - 200, button.size.height + 4), ancestor: overlay),
-        button.localToGlobal(button.size.bottomRight(const Offset(0, 4)), ancestor: overlay),
+        button.localToGlobal(Offset(button.size.width - 300, button.size.height + 8), ancestor: overlay),
+        button.localToGlobal(button.size.bottomRight(const Offset(0, 8)), ancestor: overlay),
       ),
       Offset.zero & overlay.size,
     );
@@ -316,7 +319,7 @@ class _TasksScreenState extends State<TasksScreen> {
       context: context,
       position: position,
       color: colors.surfaceVariant,
-      constraints: const BoxConstraints(minWidth: 250, maxWidth: 350),
+      constraints: const BoxConstraints(minWidth: 300, maxWidth: 300),
       items: state.notificationTasks.map((task) {
         final elapsed = task.timeSpentSeconds + 
             (task.timerStartedAt != null ? DateTime.now().difference(task.timerStartedAt!).inSeconds : 0);

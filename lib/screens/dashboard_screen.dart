@@ -273,8 +273,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     
     final RelativeRect position = RelativeRect.fromRect(
       Rect.fromPoints(
-        button.localToGlobal(Offset(0, button.size.height + 4), ancestor: overlay),
-        button.localToGlobal(button.size.bottomRight(const Offset(0, 4)), ancestor: overlay),
+        button.localToGlobal(Offset(button.size.width - 300, button.size.height + 8), ancestor: overlay),
+        button.localToGlobal(button.size.bottomRight(const Offset(0, 8)), ancestor: overlay),
       ),
       Offset.zero & overlay.size,
     );
@@ -283,7 +283,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       context: context,
       position: position,
       color: colors.surfaceVariant,
-      constraints: const BoxConstraints(minWidth: 250, maxWidth: 350),
+      constraints: const BoxConstraints(minWidth: 300, maxWidth: 300),
       items: state.notificationTasks.map((task) {
         final elapsed = task.timeSpentSeconds + 
             (task.timerStartedAt != null ? DateTime.now().difference(task.timerStartedAt!).inSeconds : 0);
