@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:csv/csv.dart';
@@ -61,8 +62,19 @@ class ReportingService {
     if (result == null || result.files.single.path == null) return null;
 
     final file = File(result.files.single.path!);
-    final contents = await file.readAsString();
-    final fields = const CsvToListConverter().convert(contents);
+    String contents;
+    try {
+      contents = await file.readAsString();
+    } on FormatException {
+      // Fallback to latin1 if not valid UTF-8 (common with Excel CSV exports)
+      final bytes = await file.readAsBytes();
+      contents = latin1.decode(bytes);
+    } catch (e) {
+      // Catch any other read errors
+      return null;
+    }
+    
+    final fields = csv.decode(contents);
 
     if (fields.isEmpty || fields.length < 2) return [];
 

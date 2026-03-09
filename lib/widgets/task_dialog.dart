@@ -21,6 +21,7 @@ class _TaskDialogState extends State<TaskDialog> {
   String _priority = 'Medium';
   String _status = 'Pending';
   DateTime? _scheduledDate;
+  late DateTime _createdAt;
 
   static const categories = [
     'General',
@@ -44,6 +45,7 @@ class _TaskDialogState extends State<TaskDialog> {
     super.initState();
     _titleCtrl = TextEditingController(text: widget.task?.title ?? '');
     _descCtrl = TextEditingController(text: widget.task?.description ?? '');
+    _createdAt = widget.task?.createdAt ?? DateTime.now();
     if (widget.task != null) {
       _category = widget.task!.category;
       _priority = widget.task!.priority;
@@ -69,10 +71,11 @@ class _TaskDialogState extends State<TaskDialog> {
       child: Container(
         width: 480,
         padding: const EdgeInsets.all(28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             // Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -121,6 +124,10 @@ class _TaskDialogState extends State<TaskDialog> {
 
             // Scheduled Date
             _buildDatePicker(colors),
+            const SizedBox(height: 16),
+
+            // Created At
+            _buildCreatedAtPicker(colors),
             const SizedBox(height: 28),
 
             // Actions
@@ -147,6 +154,7 @@ class _TaskDialogState extends State<TaskDialog> {
               ],
             ),
           ],
+        ),
         ),
       ),
     );
@@ -215,6 +223,102 @@ class _TaskDialogState extends State<TaskDialog> {
                 .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                 .toList(),
             onChanged: onChanged,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCreatedAtPicker(AppThemeColors colors) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Created At',
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: colors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 6),
+        InkWell(
+          onTap: () async {
+            final date = await showDatePicker(
+              context: context,
+              initialDate: _createdAt,
+              firstDate: DateTime(2020),
+              lastDate: DateTime(2100),
+              builder: (context, child) {
+                return Theme(
+                  data: (isDark ? ThemeData.dark() : ThemeData.light()).copyWith(
+                    colorScheme: isDark
+                        ? ColorScheme.dark(
+                            primary: AppTheme.primary,
+                            surface: colors.surface,
+                          )
+                        : ColorScheme.light(
+                            primary: AppTheme.primary,
+                            surface: colors.surface,
+                          ),
+                  ),
+                  child: child!,
+                );
+              },
+            );
+            if (date != null) {
+              if (!mounted) return;
+              final time = await showTimePicker(
+                context: context,
+                initialTime: TimeOfDay.fromDateTime(_createdAt),
+                builder: (context, child) {
+                  return Theme(
+                    data: (isDark ? ThemeData.dark() : ThemeData.light()).copyWith(
+                      colorScheme: isDark
+                          ? ColorScheme.dark(
+                              primary: AppTheme.primary,
+                              surface: colors.surface,
+                            )
+                          : ColorScheme.light(
+                              primary: AppTheme.primary,
+                              surface: colors.surface,
+                            ),
+                    ),
+                    child: child!,
+                  );
+                },
+              );
+              if (time != null) {
+                setState(() => _createdAt = DateTime(
+                    date.year, date.month, date.day, time.hour, time.minute));
+              } else {
+                setState(() => _createdAt = DateTime(
+                    date.year, date.month, date.day, _createdAt.hour, _createdAt.minute));
+              }
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+            decoration: BoxDecoration(
+              color: colors.surfaceVariant,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.access_time,
+                    size: 16, color: colors.textSecondary),
+                const SizedBox(width: 10),
+                Text(
+                  DateFormat('MMM dd, yyyy hh:mm a').format(_createdAt),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: colors.textPrimary,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -305,7 +409,7 @@ class _TaskDialogState extends State<TaskDialog> {
       priority: _priority,
       status: _status,
       scheduledDate: _scheduledDate,
-      createdAt: widget.task?.createdAt ?? DateTime.now(),
+      createdAt: _createdAt,
       completedAt: _status == 'Completed'
           ? (widget.task?.completedAt ?? DateTime.now())
           : null,
