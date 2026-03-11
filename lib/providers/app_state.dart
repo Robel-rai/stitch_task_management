@@ -65,6 +65,10 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   List<Task> _recentTasks = [];
   List<Task> get recentTasks => _recentTasks;
 
+  // ─── Custom Categories ───
+  List<String> _customCategories = [];
+  List<String> get customCategories => _customCategories;
+
   // ─── Lifecycle & Notifications ───
   bool _isAppVisible = true;
   final Set<int> _notifiedTaskIds = {}; // keeps track of tasks that triggered break reminder
@@ -105,6 +109,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> initialize() async {
     final prefs = await SharedPreferences.getInstance();
     _isDarkMode = prefs.getBool('isDarkMode') ?? true;
+    _customCategories = prefs.getStringList('customCategories') ?? [];
     
     await refreshAll();
     // Register lifecycle observer
@@ -215,6 +220,31 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     _priorityFilter = null;
     _searchQuery = '';
     refreshTasks();
+  }
+
+  // ─── Custom Categories Operations ───
+  Future<void> addCustomCategory(String category) async {
+    if (category.trim().isEmpty) return;
+    if (!_customCategories.contains(category)) {
+      _customCategories.add(category);
+      notifyListeners();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('customCategories', _customCategories);
+    }
+  }
+
+  Future<void> removeCustomCategory(String category) async {
+    if (_customCategories.contains(category)) {
+      _customCategories.remove(category);
+      // Remove from category filter if currently selected
+      if (_categoryFilter == category) {
+        setCategoryFilter(null);
+      } else {
+        notifyListeners();
+      }
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('customCategories', _customCategories);
+    }
   }
 
   // ─── Task Operations ───

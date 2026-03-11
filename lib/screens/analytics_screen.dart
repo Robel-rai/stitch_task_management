@@ -23,6 +23,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   double _avgCompletionTime = 0;
   Map<int, double> _focusTimePerDay = {};
   double _dailyAvgFocusHours = 0;
+  Map<int, double> _monthlyFocusTimePerDay = {};
+  double _monthlyAvgFocusHours = 0;
+  bool _isWeeklyFocusView = true;
   Map<String, double> _categoryPerformance = {};
   Map<String, dynamic> _weeklyReport = {};
   bool _loading = true;
@@ -43,6 +46,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       AnalyticsService.getDailyAvgFocusHours(),
       AnalyticsService.getCategoryPerformance(),
       ReportingService.generateWeeklyReport(),
+      AnalyticsService.getFocusTimePerDayThisMonth(),
+      AnalyticsService.getMonthlyAvgFocusHours(),
     ]);
 
     setState(() {
@@ -54,6 +59,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       _dailyAvgFocusHours = results[5] as double;
       _categoryPerformance = results[6] as Map<String, double>;
       _weeklyReport = results[7] as Map<String, dynamic>;
+      _monthlyFocusTimePerDay = results[8] as Map<int, double>;
+      _monthlyAvgFocusHours = results[9] as double;
       _loading = false;
     });
   }
@@ -177,8 +184,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     const SizedBox(width: 32),
                     // Focus Time Line Chart
                     Expanded(child: _FocusTimeChart(
-                      data: _focusTimePerDay,
-                      avgHours: _dailyAvgFocusHours,
+                      data: _isWeeklyFocusView ? _focusTimePerDay : _monthlyFocusTimePerDay,
+                      avgHours: _isWeeklyFocusView ? _dailyAvgFocusHours : _monthlyAvgFocusHours,
+                      isWeekly: _isWeeklyFocusView,
+                      onToggle: () {
+                        setState(() {
+                          _isWeeklyFocusView = !_isWeeklyFocusView;
+                        });
+                      },
                     )),
                   ],
                 ),
@@ -336,7 +349,12 @@ class _CategoryRadar extends StatelessWidget {
                 ],
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => _CategoryDetailsDialog(data: data),
+                  );
+                },
                 child: const Text('Full Details',
                     style: TextStyle(
                         color: AppTheme.primary,
@@ -438,11 +456,186 @@ class _CategoryRadar extends StatelessWidget {
   }
 }
 
+// ──── Category Details Dialog ────
+class _CategoryDetailsDialog extends StatelessWidget {
+  final Map<String, double> data;
+  const _CategoryDetailsDialog({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+    
+    // Sort data by value descending for the list
+    final sortedEntries = data.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
+    return Dialog(
+      backgroundColor: colors.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: colors.border),
+      ),
+      child: Container(
+        width: 700,
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Category Performance Details',
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: colors.textPrimary)),
+                    const SizedBox(height: 4),
+                    Text('Detailed breakdown of completion rates',
+                        style: TextStyle(
+                            fontSize: 13, color: colors.textTertiary)),
+                  ],
+                ),
+                IconButton(
+                  icon: Icon(Icons.close, color: colors.textTertiary),
+                  onPressed: () => Navigator.pop(context),
+                  splashRadius: 20,
+                ),
+              ],
+            ),
+            const SizedBox(height: 40),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Radar Chart
+                Expanded(
+                  flex: 5,
+                  child: data.length < 3
+                      ? SizedBox(
+                          height: 300,
+                          child: Center(
+                            child: Text(
+                              'Need at least 3 categories for radar chart',
+                              style: TextStyle(color: colors.textTertiary),
+                            ),
+                          ),
+                        )
+                      : SizedBox(
+                          height: 350,
+                          child: RadarChart(
+                            RadarChartData(
+                              dataSets: [
+                                RadarDataSet(
+                                  fillColor: AppTheme.primary.withValues(alpha: 0.2),
+                                  borderColor: AppTheme.primary,
+                                  borderWidth: 2,
+                                  dataEntries: data.values
+                                      .map((v) => RadarEntry(value: v))
+                                      .toList(),
+                                ),
+                              ],
+                              radarBorderData: BorderSide(
+                                color: colors.border.withValues(alpha: 0.5),
+                              ),
+                              tickBorderData: BorderSide(
+                                color: colors.border.withValues(alpha: 0.3),
+                              ),
+                              gridBorderData: BorderSide(
+                                color: colors.border.withValues(alpha: 0.3),
+                              ),
+                              radarBackgroundColor: Colors.transparent,
+                              tickCount: 5,
+                              ticksTextStyle: TextStyle(
+                                  fontSize: 10, color: colors.textTertiary),
+                              titleTextStyle: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: colors.textSecondary,
+                              ),
+                              getTitle: (index, _) {
+                                final keys = data.keys.toList();
+                                return RadarChartTitle(
+                                  text: index < keys.length ? keys[index] : '',
+                                );
+                              },
+                              titlePositionPercentageOffset: 0.2,
+                            ),
+                          ),
+                        ),
+                ),
+                const SizedBox(width: 48),
+                // Data List
+                Expanded(
+                  flex: 4,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Completion Rates',
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: colors.textSecondary)),
+                      const SizedBox(height: 24),
+                      ...sortedEntries.map((e) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 12, height: 12,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: AppTheme.getCategoryColor(e.key),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(e.key,
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: colors.textPrimary,
+                                          fontWeight: FontWeight.w500)),
+                                ],
+                              ),
+                              Text('${e.value.toStringAsFixed(1)}%',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      color: colors.textPrimary,
+                                      fontWeight: FontWeight.w700)),
+                            ],
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 // ──── Focus Time Chart ────
 class _FocusTimeChart extends StatelessWidget {
   final Map<int, double> data;
   final double avgHours;
-  const _FocusTimeChart({required this.data, required this.avgHours});
+  final bool isWeekly;
+  final VoidCallback onToggle;
+
+  const _FocusTimeChart({
+    required this.data,
+    required this.avgHours,
+    required this.isWeekly,
+    required this.onToggle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -476,41 +669,62 @@ class _FocusTimeChart extends StatelessWidget {
                           fontSize: 13, color: colors.textTertiary)),
                 ],
               ),
-              Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: colors.surfaceVariant,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: colors.surface,
-                        borderRadius: BorderRadius.circular(6),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+              GestureDetector(
+                onTap: onToggle,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: colors.surfaceVariant,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 4),
+                        decoration: isWeekly
+                            ? BoxDecoration(
+                                color: colors.surface,
+                                borderRadius: BorderRadius.circular(6),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.05),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              )
+                            : null,
+                        child: Text('Week',
+                            style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: isWeekly ? FontWeight.w500 : FontWeight.normal,
+                                color: isWeekly ? colors.textPrimary : colors.textTertiary)),
                       ),
-                      child: Text('Week',
-                          style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                              color: colors.textPrimary)),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Text('Month',
-                          style: TextStyle(
-                              fontSize: 11, color: colors.textTertiary)),
-                    ),
-                  ],
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 4),
+                        decoration: !isWeekly
+                            ? BoxDecoration(
+                                color: colors.surface,
+                                borderRadius: BorderRadius.circular(6),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.05),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              )
+                            : null,
+                        child: Text('Month',
+                            style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: !isWeekly ? FontWeight.w500 : FontWeight.normal,
+                                color: !isWeekly ? colors.textPrimary : colors.textTertiary)),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -533,18 +747,28 @@ class _FocusTimeChart extends StatelessWidget {
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      getTitlesWidget: (value, meta) => Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text(
-                          days[value.toInt()],
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: colors.textTertiary,
+                      getTitlesWidget: (value, meta) {
+                        int idx = value.toInt();
+                        String title = '';
+                        if (isWeekly) {
+                           if (idx >= 0 && idx < days.length) title = days[idx];
+                        } else {
+                           // Show approx every 5 days for month view
+                           if (idx == 1 || idx % 5 == 0) title = idx.toString();
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(
+                            title,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: colors.textTertiary,
+                            ),
                           ),
-                        ),
-                      ),
-                      interval: 1,
+                        );
+                      },
+                      interval: isWeekly ? 1 : 5,
                     ),
                   ),
                   leftTitles: const AxisTitles(
@@ -557,8 +781,11 @@ class _FocusTimeChart extends StatelessWidget {
                 borderData: FlBorderData(show: false),
                 lineBarsData: [
                   LineChartBarData(
-                    spots: List.generate(7, (i) {
+                    spots: isWeekly ? List.generate(7, (i) {
                       return FlSpot(i.toDouble(), data[i] ?? 0);
+                    }) : List.generate(data.length, (i) {
+                      int day = i + 1; // days are 1-indexed
+                      return FlSpot(day.toDouble(), data[day] ?? 0);
                     }),
                     isCurved: true,
                     color: AppTheme.primary,

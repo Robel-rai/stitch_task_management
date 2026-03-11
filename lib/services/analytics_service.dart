@@ -114,6 +114,39 @@ class AnalyticsService {
     return values.reduce((a, b) => a + b) / values.length;
   }
 
+  /// Focus time per day of the current month (hours). Key is day of month (1-31)
+  static Future<Map<int, double>> getFocusTimePerDayThisMonth() async {
+    final now = DateTime.now();
+    final firstDay = DateTime(now.year, now.month, 1);
+    final lastDay = DateTime(now.year, now.month + 1, 0);
+    final focusMap = <int, double>{};
+
+    // Initialize all days of the month to 0
+    for (int i = 1; i <= lastDay.day; i++) {
+      focusMap[i] = 0.0;
+    }
+
+    final tasks = await AppDatabase.getTasksInRange(firstDay, lastDay);
+    for (final task in tasks) {
+      if (task.timeSpentSeconds > 0) {
+        // If task has completedAt use that, else use createdAt (fallback)
+        final date = task.completedAt ?? task.createdAt;
+        if (date.month == now.month && date.year == now.year) {
+          focusMap[date.day] = (focusMap[date.day] ?? 0) + (task.timeSpentSeconds / 3600.0);
+        }
+      }
+    }
+    return focusMap;
+  }
+
+  /// Daily average focus time this month in hours
+  static Future<double> getMonthlyAvgFocusHours() async {
+    final focusMap = await getFocusTimePerDayThisMonth();
+    final values = focusMap.values.where((v) => v > 0);
+    if (values.isEmpty) return 0;
+    return values.reduce((a, b) => a + b) / values.length;
+  }
+
   /// Weekly summary data
   static Future<Map<String, dynamic>> getWeeklySummary() async {
     final now = DateTime.now();

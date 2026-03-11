@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import '../models/task.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_colors.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_state.dart';
 
 /// Dialog for creating or editing a task.
 class TaskDialog extends StatefulWidget {
@@ -64,6 +66,13 @@ class _TaskDialogState extends State<TaskDialog> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<AppThemeColors>()!;
+    final customCategories = context.watch<AppState>().customCategories;
+    final List<String> allCategories = <String>{...categories, ...customCategories}.toList();
+
+// Ensure current _category is valid
+    if (!allCategories.contains(_category)) {
+      _category = allCategories.isNotEmpty ? allCategories.first : 'General';
+    }
 
     return Dialog(
       backgroundColor: colors.surface,
@@ -108,7 +117,7 @@ class _TaskDialogState extends State<TaskDialog> {
             // Category + Priority row
             Row(
               children: [
-                Expanded(child: _buildDropdown('Category', _category, categories,
+                Expanded(child: _buildDropdown('Category', _category, allCategories,
                     (v) => setState(() => _category = v!), colors)),
                 const SizedBox(width: 16),
                 Expanded(child: _buildDropdown('Priority', _priority, priorities,
@@ -219,9 +228,7 @@ class _TaskDialogState extends State<TaskDialog> {
             underline: const SizedBox(),
             dropdownColor: colors.surfaceVariant,
             style: TextStyle(fontSize: 14, color: colors.textPrimary),
-            items: items
-                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                .toList(),
+            items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
             onChanged: onChanged,
           ),
         ),
