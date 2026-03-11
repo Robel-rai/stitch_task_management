@@ -490,6 +490,13 @@ class _FocusTimeChart extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: colors.surface,
                         borderRadius: BorderRadius.circular(6),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Text('Week',
                           style: TextStyle(
@@ -576,8 +583,8 @@ class _FocusTimeChart extends StatelessWidget {
                     getTooltipItems: (spots) => spots.map((s) {
                       return LineTooltipItem(
                         '${s.y.toStringAsFixed(1)}h',
-                        const TextStyle(
-                          color: Colors.white,
+                        TextStyle(
+                          color: colors.textPrimary,
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                         ),
