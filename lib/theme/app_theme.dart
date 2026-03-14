@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
 class AppTheme {
-  static const Color primary = Color(0xFF090966);
+  static const Color primary = Color(0xFF2e2ef4);
   static const Color backgroundDark = Color(0xFF101022);
   static const Color backgroundLight = Color(0xFFD4D4FF);
   static const Color surfaceDark = Color(0xFF0F172A); // slate-900
