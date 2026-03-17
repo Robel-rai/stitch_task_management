@@ -16,7 +16,7 @@ class ReportingService {
     final headers = [
       'ID', 'Title', 'Description', 'Category', 'Priority', 'Status',
       'Scheduled Date', 'Created At', 'Completed At', 'Time Spent (seconds)',
-      'Time Spent (formatted)',
+      'Time Spent (formatted)', 'Subtasks',
     ];
 
     final rows = tasks.map((t) => [
@@ -31,6 +31,7 @@ class ReportingService {
       t.completedAt != null ? DateFormat('yyyy-MM-dd HH:mm').format(t.completedAt!) : '',
       t.timeSpentSeconds,
       t.formattedTimeFriendly,
+      jsonEncode(t.subtasks.map((e) => e.toMap()).toList()),
     ]).toList();
 
     final csv = _toCsv([headers, ...rows]);
@@ -84,13 +85,37 @@ class ReportingService {
       final row = fields[i];
       if (row.length < 10) continue; // safety check
 
+      List<Subtask> parsedSubtasks = [];
+      if (row.length > 11 && row[11] != null) {
+        try {
+          final List<dynamic> decoded = jsonDecode(row[11].toString());
+          parsedSubtasks = decoded.map((e) => Subtask.fromMap(e as Map<String, dynamic>)).toList();
+        } catch (_) {}
+      }
+
+      String rawStatus = row[5]?.toString().trim() ?? 'Pending';
+      String normalizedStatus = 'Pending';
+      if (rawStatus.toLowerCase() == 'complete' || rawStatus.toLowerCase() == 'completed') {
+        normalizedStatus = 'Completed';
+      } else if (rawStatus.toLowerCase() == 'in progress' || rawStatus.toLowerCase() == 'inprogress') {
+        normalizedStatus = 'In Progress';
+      } else if (rawStatus.isNotEmpty) {
+        // Keep original if it doesn't match common ones, but TaskDialog enforces constraint
+        // Better to check if it's one of the valid statuses
+        if (['Pending', 'In Progress', 'Completed'].contains(rawStatus)) {
+          normalizedStatus = rawStatus;
+        } else {
+          normalizedStatus = 'Pending';
+        }
+      }
+
       tasks.add(Task(
         id: int.tryParse(row[0].toString()),
         title: row[1]?.toString() ?? '',
         description: row[2]?.toString() ?? '',
         category: row[3]?.toString() ?? 'General',
         priority: row[4]?.toString() ?? 'Medium',
-        status: row[5]?.toString() ?? 'Pending',
+        status: normalizedStatus,
         scheduledDate: row[6] != null && row[6].toString().isNotEmpty
             ? DateTime.tryParse(row[6].toString())
             : null,
@@ -101,6 +126,7 @@ class ReportingService {
             ? DateTime.tryParse(row[8].toString())
             : null,
         timeSpentSeconds: int.tryParse(row[9].toString()) ?? 0,
+        subtasks: parsedSubtasks,
       ));
     }
     return tasks;

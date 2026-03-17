@@ -388,7 +388,7 @@ class _TaskDialogState extends State<TaskDialog> {
               context: context,
               initialDate: _createdAt,
               firstDate: DateTime(2020),
-              lastDate: DateTime(2100),
+              lastDate: DateTime(3000),
               builder: (context, child) {
                 return Theme(
                   data: (isDark ? ThemeData.dark() : ThemeData.light()).copyWith(
@@ -484,7 +484,7 @@ class _TaskDialogState extends State<TaskDialog> {
               context: context,
               initialDate: _scheduledDate ?? DateTime.now(),
               firstDate: DateTime(2020),
-              lastDate: DateTime(2100),
+              lastDate: DateTime(3000),
               builder: (context, child) {
                 return Theme(
                   data: (isDark ? ThemeData.dark() : ThemeData.light()).copyWith(

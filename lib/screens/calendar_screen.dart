@@ -35,11 +35,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final tasks = await AppDatabase.getTasksInRange(start, end);
     final map = <String, List<Task>>{};
     for (final t in tasks) {
-      if (t.scheduledDate != null) {
-        final key = DateFormat('yyyy-MM-dd').format(t.scheduledDate!);
-        map.putIfAbsent(key, () => []);
-        map[key]!.add(t);
-      }
+      final dateToUse = t.scheduledDate ?? t.createdAt;
+      final key = DateFormat('yyyy-MM-dd').format(dateToUse);
+      map.putIfAbsent(key, () => []);
+      map[key]!.add(t);
     }
     setState(() => _monthTasks = map);
   }

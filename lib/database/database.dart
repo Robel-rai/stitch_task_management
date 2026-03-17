@@ -41,7 +41,11 @@ class AppDatabase {
         },
         onUpgrade: (db, oldVersion, newVersion) async {
           if (oldVersion < 2) {
-            await db.execute("ALTER TABLE tasks ADD COLUMN subtasks TEXT DEFAULT '[]'");
+            final tableInfo = await db.rawQuery('PRAGMA table_info(tasks)');
+            final hasSubtasks = tableInfo.any((c) => c['name'] == 'subtasks');
+            if (!hasSubtasks) {
+              await db.execute("ALTER TABLE tasks ADD COLUMN subtasks TEXT DEFAULT '[]'");
+            }
           }
         },
       ),
@@ -122,7 +126,7 @@ class AppDatabase {
     final dateStr = date.toIso8601String().split('T')[0];
     final results = await db.query(
       'tasks',
-      where: 'scheduled_date LIKE ?',
+      where: 'COALESCE(scheduled_date, created_at) LIKE ?',
       whereArgs: ['$dateStr%'],
     );
     return results.map((m) => Task.fromMap(m)).toList();
@@ -133,7 +137,7 @@ class AppDatabase {
     final db = await database;
     final results = await db.query(
       'tasks',
-      where: 'scheduled_date >= ? AND scheduled_date <= ?',
+      where: 'COALESCE(scheduled_date, created_at) >= ? AND COALESCE(scheduled_date, created_at) <= ?',
       whereArgs: [start.toIso8601String(), end.toIso8601String()],
     );
     return results.map((m) => Task.fromMap(m)).toList();

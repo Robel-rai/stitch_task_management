@@ -443,7 +443,12 @@ class _WeeklyBarChart extends StatelessWidget {
                 ],
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => _WeeklyLineChartDialog(data: data),
+                  );
+                },
                 child: const Text(
                   'View details',
                   style: TextStyle(
