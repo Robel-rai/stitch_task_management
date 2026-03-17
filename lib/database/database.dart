@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -15,8 +17,21 @@ class AppDatabase {
   static Future<Database> _initDatabase() async {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
-    final dir = await getApplicationDocumentsDirectory();
-    final dbPath = p.join(dir.path, 'task_recorder_pro.db');
+
+    final String dbPath;
+    if (kReleaseMode) {
+      // Release: store DB next to the installed executable
+      final exeDir = p.dirname(Platform.resolvedExecutable);
+      final dataDir = Directory(p.join(exeDir, 'data'));
+      if (!await dataDir.exists()) {
+        await dataDir.create(recursive: true);
+      }
+      dbPath = p.join(dataDir.path, 'task_recorder_pro.db');
+    } else {
+      // Debug: store DB in Documents for easier testing
+      final dir = await getApplicationDocumentsDirectory();
+      dbPath = p.join(dir.path, 'task_recorder_pro.db');
+    }
     return await databaseFactoryFfi.openDatabase(
       dbPath,
       options: OpenDatabaseOptions(

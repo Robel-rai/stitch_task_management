@@ -5,7 +5,7 @@ AppId={{D37E7A6B-99DE-4581-9AE7-23A4DBA4CC61}
 AppName=Task Flow
 AppVersion=1.3.19
 AppPublisher=Robel
-DefaultDirName={autopf}\Task Flow
+DefaultDirName={localappdata}\Task Flow
 DisableProgramGroupPage=yes
 ; Produce the installer in the current TaskFlowExe directory
 OutputDir=.
