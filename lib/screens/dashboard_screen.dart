@@ -41,9 +41,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 32),
               decoration: BoxDecoration(
                 color: colors.background.withValues(alpha: 0.5),
-                border: Border(
-                  bottom: BorderSide(color: colors.border),
-                ),
+                border: Border(bottom: BorderSide(color: colors.border)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -67,13 +65,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Autocomplete<Task>(
-                          optionsBuilder: (TextEditingValue textEditingValue) async {
-                            if (textEditingValue.text.isEmpty) {
-                              return const Iterable<Task>.empty();
-                            }
-                            final allTasks = await AppDatabase.getAllTasks(searchQuery: textEditingValue.text);
-                            return allTasks.take(3);
-                          },
+                          optionsBuilder:
+                              (TextEditingValue textEditingValue) async {
+                                if (textEditingValue.text.isEmpty) {
+                                  return const Iterable<Task>.empty();
+                                }
+                                final allTasks = await AppDatabase.getAllTasks(
+                                  searchQuery: textEditingValue.text,
+                                );
+                                return allTasks.take(3);
+                              },
                           displayStringForOption: (Task option) => option.title,
                           onSelected: (Task selection) async {
                             // Clear focus
@@ -82,35 +83,53 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             state.setNavIndex(1);
                             // Set search query to match so it filters there too
                             state.setSearchQuery(selection.title);
-                            
+
                             // Open task dialog on next frame to allow navigation
-                            WidgetsBinding.instance.addPostFrameCallback((_) async {
-                               final result = await showDialog<Task>(
-                                  context: context,
-                                  builder: (_) => TaskDialog(task: selection),
-                               );
-                               if (result != null && context.mounted) {
-                                  context.read<AppState>().updateTask(result);
-                               }
+                            WidgetsBinding.instance.addPostFrameCallback((
+                              _,
+                            ) async {
+                              final result = await showDialog<Task>(
+                                context: context,
+                                builder: (_) => TaskDialog(task: selection),
+                              );
+                              if (result != null && context.mounted) {
+                                context.read<AppState>().updateTask(result);
+                              }
                             });
                           },
-                          fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-                            return TextField(
-                              controller: controller,
-                              focusNode: focusNode,
-                              onSubmitted: (value) {
-                                state.setSearchQuery(value);
-                                state.setNavIndex(1);
+                          fieldViewBuilder:
+                              (
+                                context,
+                                controller,
+                                focusNode,
+                                onFieldSubmitted,
+                              ) {
+                                return TextField(
+                                  controller: controller,
+                                  focusNode: focusNode,
+                                  onSubmitted: (value) {
+                                    state.setSearchQuery(value);
+                                    state.setNavIndex(1);
+                                  },
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: colors.textPrimary,
+                                  ),
+                                  decoration: InputDecoration(
+                                    hintText: 'Search activities...',
+                                    prefixIcon: Icon(
+                                      Icons.search,
+                                      size: 18,
+                                      color: colors.textSecondary,
+                                    ),
+                                    border: InputBorder.none,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10,
+                                      horizontal: 12,
+                                    ),
+                                  ),
+                                );
                               },
-                              style: TextStyle(fontSize: 13, color: colors.textPrimary),
-                              decoration: InputDecoration(
-                                hintText: 'Search activities...',
-                                prefixIcon: Icon(Icons.search, size: 18, color: colors.textSecondary),
-                                border: InputBorder.none,
-                                contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                              ),
-                            );
-                          },
                           optionsViewBuilder: (context, onSelected, options) {
                             return Align(
                               alignment: Alignment.topLeft,
@@ -120,34 +139,45 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 color: colors.surface,
                                 child: Container(
                                   width: 256,
-                                  constraints: const BoxConstraints(maxHeight: 200),
+                                  constraints: const BoxConstraints(
+                                    maxHeight: 200,
+                                  ),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(color: colors.border),
                                   ),
                                   child: ListView.builder(
-                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 8,
+                                    ),
                                     shrinkWrap: true,
                                     itemCount: options.length,
-                                    itemBuilder: (BuildContext context, int index) {
-                                      final Task option = options.elementAt(index);
-                                      return InkWell(
-                                        onTap: () {
-                                          onSelected(option);
-                                        },
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                                          child: Text(
-                                            option.title,
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              color: colors.textPrimary,
-                                              fontWeight: FontWeight.w500,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                          final Task option = options.elementAt(
+                                            index,
+                                          );
+                                          return InkWell(
+                                            onTap: () {
+                                              onSelected(option);
+                                            },
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 16,
+                                                    vertical: 10,
+                                                  ),
+                                              child: Text(
+                                                option.title,
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  color: colors.textPrimary,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                        ),
-                                      );
-                                    },
+                                          );
+                                        },
                                   ),
                                 ),
                               ),
@@ -186,7 +216,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             value: '${state.totalTasks}',
                             icon: Icons.assignment,
                             iconColor: AppTheme.blue,
-                            badge: state.totalTasks > 0 ? '+${state.totalTasks}' : null,
+                            badge: state.totalTasks > 0
+                                ? '+${state.totalTasks}'
+                                : null,
                           ),
                         ),
                         const SizedBox(width: 24),
@@ -233,7 +265,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           // Bar Chart
                           Expanded(
                             flex: 2,
-                            child: _WeeklyBarChart(data: state.weeklyCompletionCounts),
+                            child: _WeeklyBarChart(
+                              data: state.weeklyCompletionCounts,
+                            ),
                           ),
                           const SizedBox(width: 24),
                           // Donut Chart
@@ -268,13 +302,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
 
     final RenderBox button = context.findRenderObject() as RenderBox;
-    final RenderBox overlay = Navigator.of(context).overlay!.context.findRenderObject() as RenderBox;
+    final RenderBox overlay =
+        Navigator.of(context).overlay!.context.findRenderObject() as RenderBox;
     final colors = Theme.of(context).extension<AppThemeColors>()!;
-    
+
     final RelativeRect position = RelativeRect.fromRect(
       Rect.fromPoints(
-        button.localToGlobal(Offset(button.size.width - 300, button.size.height + 8), ancestor: overlay),
-        button.localToGlobal(button.size.bottomRight(const Offset(0, 8)), ancestor: overlay),
+        button.localToGlobal(
+          Offset(button.size.width - 300, button.size.height + 8),
+          ancestor: overlay,
+        ),
+        button.localToGlobal(
+          button.size.bottomRight(const Offset(0, 8)),
+          ancestor: overlay,
+        ),
       ),
       Offset.zero & overlay.size,
     );
@@ -285,8 +326,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       color: colors.surfaceVariant,
       constraints: const BoxConstraints(minWidth: 300, maxWidth: 300),
       items: state.notificationTasks.map((task) {
-        final elapsed = task.timeSpentSeconds + 
-            (task.timerStartedAt != null ? DateTime.now().difference(task.timerStartedAt!).inSeconds : 0);
+        final elapsed =
+            task.timeSpentSeconds +
+            (task.timerStartedAt != null
+                ? DateTime.now().difference(task.timerStartedAt!).inSeconds
+                : 0);
         final isAlert = elapsed >= 7200;
 
         return PopupMenuItem<Task>(
@@ -333,7 +377,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (selectedTask != null) {
         // Navigate to Tasks Page
         state.setNavIndex(1);
-        
+
         // Open the dialog after navigation
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           final result = await showDialog<Task>(
@@ -435,10 +479,7 @@ class _WeeklyBarChart extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     'Completed tasks per day',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: colors.textTertiary,
-                    ),
+                    style: TextStyle(fontSize: 13, color: colors.textTertiary),
                   ),
                 ],
               ),
@@ -500,11 +541,14 @@ class _WeeklyBarChart extends StatelessWidget {
                     ),
                   ),
                   leftTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false)),
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
                   topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false)),
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
                   rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false)),
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
                 ),
                 gridData: const FlGridData(show: false),
                 borderData: FlBorderData(show: false),
@@ -517,7 +561,8 @@ class _WeeklyBarChart extends StatelessWidget {
                         toY: val,
                         width: 28,
                         color: AppTheme.primary.withValues(
-                            alpha: val > 0 ? 0.7 : 0.15),
+                          alpha: val > 0 ? 0.7 : 0.15,
+                        ),
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(6),
                           topRight: Radius.circular(6),
@@ -535,6 +580,153 @@ class _WeeklyBarChart extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ──── Weekly Line Chart Dialog ────
+class _WeeklyLineChartDialog extends StatelessWidget {
+  final Map<int, int> data;
+  const _WeeklyLineChartDialog({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeColors>()!;
+    final maxVal = data.values.fold<int>(0, (a, b) => a > b ? a : b);
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+    final spots = List.generate(7, (i) {
+      return FlSpot(i.toDouble(), (data[i] ?? 0).toDouble());
+    });
+
+    return Dialog(
+      backgroundColor: colors.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        width: 600,
+        height: 400,
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Weekly Productivity (Line Chart)',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: colors.textPrimary,
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.close, color: colors.textSecondary),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 32),
+            Expanded(
+              child: LineChart(
+                LineChartData(
+                  minX: 0,
+                  maxX: 6,
+                  minY: 0,
+                  maxY: maxVal > 0 ? maxVal.toDouble() + 2 : 10,
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    getDrawingHorizontalLine: (value) =>
+                        FlLine(color: colors.border, strokeWidth: 1),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 30,
+                        getTitlesWidget: (value, meta) {
+                          if (value % 1 != 0) return const SizedBox.shrink();
+                          final int idx = value.toInt();
+                          if (idx < 0 || idx >= 7)
+                            return const SizedBox.shrink();
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Text(
+                              days[idx],
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: colors.textTertiary,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 40,
+                        getTitlesWidget: (value, meta) {
+                          if (value % 1 != 0) return const SizedBox.shrink();
+                          return Center(
+                            child: Text(
+                              value.toInt().toString(),
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: colors.textTertiary,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                  ),
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: spots,
+                      isCurved: true,
+                      color: AppTheme.primary,
+                      barWidth: 4,
+                      isStrokeCapRound: true,
+                      dotData: const FlDotData(show: true),
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: AppTheme.primary.withValues(alpha: 0.2),
+                      ),
+                    ),
+                  ],
+                  lineTouchData: LineTouchData(
+                    touchTooltipData: LineTouchTooltipData(
+                      getTooltipColor: (_) => colors.surface,
+                      getTooltipItems: (touchedSpots) {
+                        return touchedSpots.map((LineBarSpot touchedSpot) {
+                          return LineTooltipItem(
+                            '${touchedSpot.y.round()} Tasks',
+                            const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          );
+                        }).toList();
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -661,7 +853,9 @@ class _CategoryDonut extends StatelessWidget {
                       Text(
                         entry.key,
                         style: TextStyle(
-                            fontSize: 13, color: colors.textPrimary),
+                          fontSize: 13,
+                          color: colors.textPrimary,
+                        ),
                       ),
                     ],
                   ),
@@ -732,9 +926,13 @@ class _RecentTasksTable extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primary,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 10),
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
                     textStyle: const TextStyle(
-                        fontSize: 13, fontWeight: FontWeight.w500),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],
@@ -749,7 +947,12 @@ class _RecentTasksTable extends StatelessWidget {
                 _tableHeader('Category', flex: 2, colors: colors),
                 _tableHeader('Duration', flex: 1, colors: colors),
                 _tableHeader('Status', flex: 1, colors: colors),
-                _tableHeader('Date', flex: 1, alignment: CrossAxisAlignment.end, colors: colors),
+                _tableHeader(
+                  'Date',
+                  flex: 1,
+                  alignment: CrossAxisAlignment.end,
+                  colors: colors,
+                ),
               ],
             ),
           ),
@@ -770,8 +973,12 @@ class _RecentTasksTable extends StatelessWidget {
     );
   }
 
-  Widget _tableHeader(String text,
-      {int flex = 1, CrossAxisAlignment alignment = CrossAxisAlignment.start, required AppThemeColors colors}) {
+  Widget _tableHeader(
+    String text, {
+    int flex = 1,
+    CrossAxisAlignment alignment = CrossAxisAlignment.start,
+    required AppThemeColors colors,
+  }) {
     return Expanded(
       flex: flex,
       child: Align(
@@ -802,16 +1009,24 @@ class _TaskRow extends StatelessWidget {
     final catColor = AppTheme.getCategoryColor(task.category);
     final statusColor = AppTheme.getStatusColor(task.status);
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: colors.border, width: 0.5),
-        ),
+        border: Border(bottom: BorderSide(color: colors.border, width: 0.5)),
       ),
       child: Row(
         children: [
@@ -869,8 +1084,7 @@ class _TaskRow extends StatelessWidget {
             flex: 1,
             child: Text(
               task.formattedTimeFriendly,
-              style: TextStyle(
-                  fontSize: 13, color: colors.textPrimary),
+              style: TextStyle(fontSize: 13, color: colors.textPrimary),
             ),
           ),
           // Status
@@ -905,10 +1119,7 @@ class _TaskRow extends StatelessWidget {
               alignment: Alignment.centerRight,
               child: Text(
                 '${months[task.createdAt.month - 1]} ${task.createdAt.day}, ${task.createdAt.year}',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: colors.textTertiary,
-                ),
+                style: TextStyle(fontSize: 13, color: colors.textTertiary),
               ),
             ),
           ),

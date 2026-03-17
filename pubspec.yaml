@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.3.0
+version: 1.3.17
 
 environment:
   sdk: ^3.11.0
@@ -113,7 +113,7 @@ msix_config:
   publisher_display_name: Yared
   identity_name: TaskFlow.App
   logo_path: AppLogo/Task Flow.png
-  msix_version: 1.0.0.0
+  msix_version: 1.0.17.0
   processor_architecture: x64
   output_path: "Final Software"
   output_name: "TaskFlow_Installer"

@@ -50,7 +50,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return Consumer<AppState>(
       builder: (context, state, _) {
         final month = state.viewingMonth;
-        final monthName = DateFormat('MMMM yyyy').format(month);
+        final monthName = DateFormat('MMM yyyy').format(month);
 
         return Row(
           children: [

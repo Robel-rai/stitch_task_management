@@ -857,7 +857,7 @@ class _ExportSection extends StatelessWidget {
               _ExportItem(
                 icon: Icons.upload_file,
                 iconColor: AppTheme.blue,
-                title: 'Upload Raw Task Data',
+                title: 'Import Raw Task Data',
                 subtitle: 'CSV Spreadsheet',
                 downloadColor: AppTheme.blue,
                 onDownload: () async {
@@ -880,7 +880,7 @@ class _ExportSection extends StatelessWidget {
               _ExportItem(
                 icon: Icons.table_chart,
                 iconColor: AppTheme.emerald,
-                title: 'Raw Activity Data',
+                title: 'Export Activity Data',
                 subtitle: 'CSV Spreadsheet',
                 downloadColor: AppTheme.emerald,
                 onDownload: () async {
