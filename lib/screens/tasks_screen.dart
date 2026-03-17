@@ -760,6 +760,57 @@ class _ListTaskItem extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                if (task.subtasks.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: task.subtasks.asMap().entries.map((entry) {
+                        final int index = entry.key;
+                        final subtask = entry.value;
+                        return GestureDetector(
+                          onTap: () {
+                            context.read<AppState>().toggleSubtaskStatus(task, index);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 6),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 16,
+                                  height: 16,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: subtask.isCompleted ? AppTheme.emerald : Colors.transparent,
+                                    border: Border.all(
+                                      color: subtask.isCompleted ? AppTheme.emerald : colors.textTertiary,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  child: subtask.isCompleted
+                                      ? const Icon(Icons.check, size: 10, color: Colors.white)
+                                      : null,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    subtask.title,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: subtask.isCompleted ? colors.textTertiary : colors.textSecondary,
+                                      decoration: subtask.isCompleted ? TextDecoration.lineThrough : null,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
               ],
             ),
           ),

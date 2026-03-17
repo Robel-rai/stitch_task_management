@@ -19,11 +19,13 @@ class TaskDialog extends StatefulWidget {
 class _TaskDialogState extends State<TaskDialog> {
   late TextEditingController _titleCtrl;
   late TextEditingController _descCtrl;
+  late TextEditingController _newSubtaskCtrl;
   String _category = 'General';
   String _priority = 'Medium';
   String _status = 'Pending';
   DateTime? _scheduledDate;
   late DateTime _createdAt;
+  List<Subtask> _subtasks = [];
 
   static const categories = [
     'General',
@@ -47,7 +49,9 @@ class _TaskDialogState extends State<TaskDialog> {
     super.initState();
     _titleCtrl = TextEditingController(text: widget.task?.title ?? '');
     _descCtrl = TextEditingController(text: widget.task?.description ?? '');
+    _newSubtaskCtrl = TextEditingController();
     _createdAt = widget.task?.createdAt ?? DateTime.now();
+    _subtasks = widget.task?.subtasks != null ? List.from(widget.task!.subtasks) : [];
     if (widget.task != null) {
       _category = widget.task!.category;
       _priority = widget.task!.priority;
@@ -60,6 +64,7 @@ class _TaskDialogState extends State<TaskDialog> {
   void dispose() {
     _titleCtrl.dispose();
     _descCtrl.dispose();
+    _newSubtaskCtrl.dispose();
     super.dispose();
   }
 
@@ -112,6 +117,10 @@ class _TaskDialogState extends State<TaskDialog> {
             // Description
             _buildField('Description', _descCtrl, 'Enter description...', colors,
                 maxLines: 3),
+            const SizedBox(height: 16),
+
+            // Subtasks
+            _buildSubtasksSection(colors),
             const SizedBox(height: 16),
 
             // Category + Priority row
@@ -167,6 +176,128 @@ class _TaskDialogState extends State<TaskDialog> {
         ),
       ),
     );
+  }
+
+  Widget _buildSubtasksSection(AppThemeColors colors) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Subtasks',
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: colors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 6),
+        if (_subtasks.isNotEmpty) ...[
+          Container(
+            decoration: BoxDecoration(
+              color: colors.surfaceVariant,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _subtasks.length,
+              separatorBuilder: (context, index) => Divider(height: 1, color: colors.border),
+              itemBuilder: (context, index) {
+                final subtask = _subtasks[index];
+                return ListTile(
+                  dense: true,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                  leading: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _subtasks[index] = subtask.copyWith(isCompleted: !subtask.isCompleted);
+                        bool allCompleted = _subtasks.every((s) => s.isCompleted);
+                        if (allCompleted) {
+                          _status = 'Completed';
+                        } else if (_status == 'Completed') {
+                           _status = 'In Progress';
+                        }
+                      });
+                    },
+                    child: Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: subtask.isCompleted ? AppTheme.emerald : Colors.transparent,
+                        border: Border.all(
+                          color: subtask.isCompleted ? AppTheme.emerald : colors.textTertiary,
+                          width: 2,
+                        ),
+                      ),
+                      child: subtask.isCompleted
+                          ? const Icon(Icons.check, size: 12, color: Colors.white)
+                          : null,
+                    ),
+                  ),
+                  title: Text(
+                    subtask.title,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: colors.textPrimary,
+                      decoration: subtask.isCompleted ? TextDecoration.lineThrough : null,
+                    ),
+                  ),
+                  trailing: IconButton(
+                    icon: Icon(Icons.close, size: 16, color: colors.textSecondary),
+                    onPressed: () {
+                      setState(() {
+                        _subtasks.removeAt(index);
+                      });
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _newSubtaskCtrl,
+                style: TextStyle(fontSize: 13, color: colors.textPrimary),
+                decoration: InputDecoration(
+                  hintText: 'Add new subtask...',
+                  filled: true,
+                  fillColor: colors.surfaceVariant,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                ),
+                onSubmitted: (val) {
+                  _addSubtask(val);
+                },
+              ),
+            ),
+            const SizedBox(width: 8),
+            IconButton(
+              onPressed: () => _addSubtask(_newSubtaskCtrl.text),
+              icon: const Icon(Icons.add_circle, color: AppTheme.primary),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  void _addSubtask(String val) {
+    if (val.trim().isEmpty) return;
+    setState(() {
+      _subtasks.add(Subtask(title: val.trim()));
+      _newSubtaskCtrl.clear();
+      if (_status == 'Completed') {
+        _status = 'In Progress';
+      }
+    });
   }
 
   Widget _buildField(
@@ -422,6 +553,7 @@ class _TaskDialogState extends State<TaskDialog> {
           : null,
       timeSpentSeconds: widget.task?.timeSpentSeconds ?? 0,
       timerStartedAt: widget.task?.timerStartedAt,
+      subtasks: _subtasks,
     );
     Navigator.pop(context, task);
   }

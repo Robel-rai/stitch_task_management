@@ -20,7 +20,7 @@ class AppDatabase {
     return await databaseFactoryFfi.openDatabase(
       dbPath,
       options: OpenDatabaseOptions(
-        version: 1,
+        version: 2,
         onCreate: (db, version) async {
           await db.execute('''
             CREATE TABLE tasks (
@@ -34,9 +34,15 @@ class AppDatabase {
               created_at TEXT NOT NULL,
               completed_at TEXT,
               time_spent_seconds INTEGER DEFAULT 0,
-              timer_started_at TEXT
+              timer_started_at TEXT,
+              subtasks TEXT DEFAULT '[]'
             )
           ''');
+        },
+        onUpgrade: (db, oldVersion, newVersion) async {
+          if (oldVersion < 2) {
+            await db.execute("ALTER TABLE tasks ADD COLUMN subtasks TEXT DEFAULT '[]'");
+          }
         },
       ),
     );

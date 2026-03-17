@@ -1,3 +1,36 @@
+import 'dart:convert';
+
+class Subtask {
+  final String title;
+  final bool isCompleted;
+
+  Subtask({required this.title, this.isCompleted = false});
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'isCompleted': isCompleted,
+    };
+  }
+
+  factory Subtask.fromMap(Map<String, dynamic> map) {
+    return Subtask(
+      title: map['title'] as String,
+      isCompleted: map['isCompleted'] as bool? ?? false,
+    );
+  }
+
+  Subtask copyWith({
+    String? title,
+    bool? isCompleted,
+  }) {
+    return Subtask(
+      title: title ?? this.title,
+      isCompleted: isCompleted ?? this.isCompleted,
+    );
+  }
+}
+
 class Task {
   final int? id;
   final String title;
@@ -11,6 +44,7 @@ class Task {
   final int timeSpentSeconds;
   // Time tracking state (not persisted in DB directly)
   final DateTime? timerStartedAt;
+  final List<Subtask> subtasks;
 
   Task({
     this.id,
@@ -24,6 +58,7 @@ class Task {
     this.completedAt,
     this.timeSpentSeconds = 0,
     this.timerStartedAt,
+    this.subtasks = const [],
   }) : createdAt = createdAt ?? DateTime.now();
 
   Task copyWith({
@@ -38,6 +73,7 @@ class Task {
     DateTime? completedAt,
     int? timeSpentSeconds,
     DateTime? timerStartedAt,
+    List<Subtask>? subtasks,
     bool clearCompletedAt = false,
     bool clearTimerStartedAt = false,
     bool clearScheduledDate = false,
@@ -54,6 +90,7 @@ class Task {
       completedAt: clearCompletedAt ? null : (completedAt ?? this.completedAt),
       timeSpentSeconds: timeSpentSeconds ?? this.timeSpentSeconds,
       timerStartedAt: clearTimerStartedAt ? null : (timerStartedAt ?? this.timerStartedAt),
+      subtasks: subtasks ?? this.subtasks,
     );
   }
 
@@ -70,10 +107,19 @@ class Task {
       'completed_at': completedAt?.toIso8601String(),
       'time_spent_seconds': timeSpentSeconds,
       'timer_started_at': timerStartedAt?.toIso8601String(),
+      'subtasks': jsonEncode(subtasks.map((e) => e.toMap()).toList()),
     };
   }
 
   factory Task.fromMap(Map<String, dynamic> map) {
+    List<Subtask> parsedSubtasks = [];
+    if (map['subtasks'] != null && map['subtasks'] is String) {
+      try {
+        final List<dynamic> decoded = jsonDecode(map['subtasks'] as String);
+        parsedSubtasks = decoded.map((e) => Subtask.fromMap(e as Map<String, dynamic>)).toList();
+      } catch (_) {}
+    }
+
     return Task(
       id: map['id'] as int?,
       title: map['title'] as String,
@@ -94,6 +140,7 @@ class Task {
       timerStartedAt: map['timer_started_at'] != null
           ? DateTime.tryParse(map['timer_started_at'] as String)
           : null,
+      subtasks: parsedSubtasks,
     );
   }
 
