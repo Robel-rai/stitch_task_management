@@ -51,7 +51,9 @@ class _TaskDialogState extends State<TaskDialog> {
     _descCtrl = TextEditingController(text: widget.task?.description ?? '');
     _newSubtaskCtrl = TextEditingController();
     _createdAt = widget.task?.createdAt ?? DateTime.now();
-    _subtasks = widget.task?.subtasks != null ? List.from(widget.task!.subtasks) : [];
+    _subtasks = widget.task?.subtasks != null
+        ? List.from(widget.task!.subtasks)
+        : [];
     if (widget.task != null) {
       _category = widget.task!.category;
       _priority = widget.task!.priority;
@@ -72,9 +74,12 @@ class _TaskDialogState extends State<TaskDialog> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<AppThemeColors>()!;
     final customCategories = context.watch<AppState>().customCategories;
-    final List<String> allCategories = <String>{...categories, ...customCategories}.toList();
+    final List<String> allCategories = <String>{
+      ...categories,
+      ...customCategories,
+    }.toList();
 
-// Ensure current _category is valid
+    // Ensure current _category is valid
     if (!allCategories.contains(_category)) {
       _category = allCategories.isNotEmpty ? allCategories.first : 'General';
     }
@@ -90,89 +95,115 @@ class _TaskDialogState extends State<TaskDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-            // Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  isEditing ? 'Edit Task' : 'New Task',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: colors.textPrimary,
+              // Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    isEditing ? 'Edit Task' : 'New Task',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: colors.textPrimary,
+                    ),
                   ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: Icon(Icons.close, color: colors.textSecondary),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Title
-            _buildField('Title', _titleCtrl, 'Enter task title...', colors),
-            const SizedBox(height: 16),
-
-            // Description
-            _buildField('Description', _descCtrl, 'Enter description...', colors,
-                maxLines: 3),
-            const SizedBox(height: 16),
-
-            // Subtasks
-            _buildSubtasksSection(colors),
-            const SizedBox(height: 16),
-
-            // Category + Priority row
-            Row(
-              children: [
-                Expanded(child: _buildDropdown('Category', _category, allCategories,
-                    (v) => setState(() => _category = v!), colors)),
-                const SizedBox(width: 16),
-                Expanded(child: _buildDropdown('Priority', _priority, priorities,
-                    (v) => setState(() => _priority = v!), colors)),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Status
-            _buildDropdown('Status', _status, statuses,
-                (v) => setState(() => _status = v!), colors),
-            const SizedBox(height: 16),
-
-            // Scheduled Date
-            _buildDatePicker(colors),
-            const SizedBox(height: 16),
-
-            // Created At
-            _buildCreatedAtPicker(colors),
-            const SizedBox(height: 28),
-
-            // Actions
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(color: colors.textSecondary),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: Icon(Icons.close, color: colors.textSecondary),
                   ),
-                ),
-                const SizedBox(width: 12),
-                ElevatedButton(
-                  onPressed: _save,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primary,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Title
+              _buildField('Title', _titleCtrl, 'Enter task title...', colors),
+              const SizedBox(height: 16),
+
+              // Description
+              _buildField(
+                'Description',
+                _descCtrl,
+                'Enter description...',
+                colors,
+                maxLines: 3,
+              ),
+              const SizedBox(height: 16),
+
+              // Subtasks
+              _buildSubtasksSection(colors),
+              const SizedBox(height: 16),
+
+              // Category + Priority row
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildDropdown(
+                      'Category',
+                      _category,
+                      allCategories,
+                      (v) => setState(() => _category = v!),
+                      colors,
+                    ),
                   ),
-                  child: Text(isEditing ? 'Update' : 'Create'),
-                ),
-              ],
-            ),
-          ],
-        ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildDropdown(
+                      'Priority',
+                      _priority,
+                      priorities,
+                      (v) => setState(() => _priority = v!),
+                      colors,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Status
+              _buildDropdown(
+                'Status',
+                _status,
+                statuses,
+                (v) => setState(() => _status = v!),
+                colors,
+              ),
+              const SizedBox(height: 16),
+
+              // Scheduled Date
+              _buildDatePicker(colors),
+              const SizedBox(height: 16),
+
+              // Created At
+              _buildCreatedAtPicker(colors),
+              const SizedBox(height: 28),
+
+              // Actions
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(color: colors.textSecondary),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  ElevatedButton(
+                    onPressed: _save,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primary,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                    ),
+                    child: Text(isEditing ? 'Update' : 'Create'),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -201,7 +232,8 @@ class _TaskDialogState extends State<TaskDialog> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: _subtasks.length,
-              separatorBuilder: (context, index) => Divider(height: 1, color: colors.border),
+              separatorBuilder: (context, index) =>
+                  Divider(height: 1, color: colors.border),
               itemBuilder: (context, index) {
                 final subtask = _subtasks[index];
                 return ListTile(
@@ -210,12 +242,16 @@ class _TaskDialogState extends State<TaskDialog> {
                   leading: GestureDetector(
                     onTap: () {
                       setState(() {
-                        _subtasks[index] = subtask.copyWith(isCompleted: !subtask.isCompleted);
-                        bool allCompleted = _subtasks.every((s) => s.isCompleted);
+                        _subtasks[index] = subtask.copyWith(
+                          isCompleted: !subtask.isCompleted,
+                        );
+                        bool allCompleted = _subtasks.every(
+                          (s) => s.isCompleted,
+                        );
                         if (allCompleted) {
                           _status = 'Completed';
                         } else if (_status == 'Completed') {
-                           _status = 'In Progress';
+                          _status = 'In Progress';
                         }
                       });
                     },
@@ -224,14 +260,22 @@ class _TaskDialogState extends State<TaskDialog> {
                       height: 20,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: subtask.isCompleted ? AppTheme.emerald : Colors.transparent,
+                        color: subtask.isCompleted
+                            ? AppTheme.emerald
+                            : Colors.transparent,
                         border: Border.all(
-                          color: subtask.isCompleted ? AppTheme.emerald : colors.textTertiary,
+                          color: subtask.isCompleted
+                              ? AppTheme.emerald
+                              : colors.textTertiary,
                           width: 2,
                         ),
                       ),
                       child: subtask.isCompleted
-                          ? const Icon(Icons.check, size: 12, color: Colors.white)
+                          ? const Icon(
+                              Icons.check,
+                              size: 12,
+                              color: Colors.white,
+                            )
                           : null,
                     ),
                   ),
@@ -240,11 +284,17 @@ class _TaskDialogState extends State<TaskDialog> {
                     style: TextStyle(
                       fontSize: 13,
                       color: colors.textPrimary,
-                      decoration: subtask.isCompleted ? TextDecoration.lineThrough : null,
+                      decoration: subtask.isCompleted
+                          ? TextDecoration.lineThrough
+                          : null,
                     ),
                   ),
                   trailing: IconButton(
-                    icon: Icon(Icons.close, size: 16, color: colors.textSecondary),
+                    icon: Icon(
+                      Icons.close,
+                      size: 16,
+                      color: colors.textSecondary,
+                    ),
                     onPressed: () {
                       setState(() {
                         _subtasks.removeAt(index);
@@ -271,7 +321,10 @@ class _TaskDialogState extends State<TaskDialog> {
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                 ),
                 onSubmitted: (val) {
                   _addSubtask(val);
@@ -301,8 +354,12 @@ class _TaskDialogState extends State<TaskDialog> {
   }
 
   Widget _buildField(
-      String label, TextEditingController ctrl, String hint, AppThemeColors colors,
-      {int maxLines = 1}) {
+    String label,
+    TextEditingController ctrl,
+    String hint,
+    AppThemeColors colors, {
+    int maxLines = 1,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -334,7 +391,12 @@ class _TaskDialogState extends State<TaskDialog> {
   }
 
   Widget _buildDropdown(
-      String label, String value, List<String> items, ValueChanged<String?> onChanged, AppThemeColors colors) {
+    String label,
+    String value,
+    List<String> items,
+    ValueChanged<String?> onChanged,
+    AppThemeColors colors,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -359,7 +421,9 @@ class _TaskDialogState extends State<TaskDialog> {
             underline: const SizedBox(),
             dropdownColor: colors.surfaceVariant,
             style: TextStyle(fontSize: 14, color: colors.textPrimary),
-            items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+            items: items
+                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                .toList(),
             onChanged: onChanged,
           ),
         ),
@@ -389,51 +453,37 @@ class _TaskDialogState extends State<TaskDialog> {
               initialDate: _createdAt,
               firstDate: DateTime(2020),
               lastDate: DateTime(3000),
-              builder: (context, child) {
-                return Theme(
-                  data: (isDark ? ThemeData.dark() : ThemeData.light()).copyWith(
-                    colorScheme: isDark
-                        ? ColorScheme.dark(
-                            primary: AppTheme.primary,
-                            surface: colors.surface,
-                          )
-                        : ColorScheme.light(
-                            primary: AppTheme.primary,
-                            surface: colors.surface,
-                          ),
-                  ),
-                  child: child!,
-                );
-              },
+              builder: (context, child) =>
+                  _buildPickerTheme(context, child, colors, isDark),
             );
             if (date != null) {
               if (!mounted) return;
               final time = await showTimePicker(
                 context: context,
                 initialTime: TimeOfDay.fromDateTime(_createdAt),
-                builder: (context, child) {
-                  return Theme(
-                    data: (isDark ? ThemeData.dark() : ThemeData.light()).copyWith(
-                      colorScheme: isDark
-                          ? ColorScheme.dark(
-                              primary: AppTheme.primary,
-                              surface: colors.surface,
-                            )
-                          : ColorScheme.light(
-                              primary: AppTheme.primary,
-                              surface: colors.surface,
-                            ),
-                    ),
-                    child: child!,
-                  );
-                },
+                builder: (context, child) =>
+                    _buildPickerTheme(context, child, colors, isDark),
               );
               if (time != null) {
-                setState(() => _createdAt = DateTime(
-                    date.year, date.month, date.day, time.hour, time.minute));
+                setState(
+                  () => _createdAt = DateTime(
+                    date.year,
+                    date.month,
+                    date.day,
+                    time.hour,
+                    time.minute,
+                  ),
+                );
               } else {
-                setState(() => _createdAt = DateTime(
-                    date.year, date.month, date.day, _createdAt.hour, _createdAt.minute));
+                setState(
+                  () => _createdAt = DateTime(
+                    date.year,
+                    date.month,
+                    date.day,
+                    _createdAt.hour,
+                    _createdAt.minute,
+                  ),
+                );
               }
             }
           },
@@ -445,15 +495,11 @@ class _TaskDialogState extends State<TaskDialog> {
             ),
             child: Row(
               children: [
-                Icon(Icons.access_time,
-                    size: 16, color: colors.textSecondary),
+                Icon(Icons.access_time, size: 16, color: colors.textSecondary),
                 const SizedBox(width: 10),
                 Text(
                   DateFormat('MMM dd, yyyy hh:mm a').format(_createdAt),
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: colors.textPrimary,
-                  ),
+                  style: TextStyle(fontSize: 14, color: colors.textPrimary),
                 ),
               ],
             ),
@@ -485,25 +531,32 @@ class _TaskDialogState extends State<TaskDialog> {
               initialDate: _scheduledDate ?? DateTime.now(),
               firstDate: DateTime(2020),
               lastDate: DateTime(3000),
-              builder: (context, child) {
-                return Theme(
-                  data: (isDark ? ThemeData.dark() : ThemeData.light()).copyWith(
-                    colorScheme: isDark
-                        ? ColorScheme.dark(
-                            primary: AppTheme.primary,
-                            surface: colors.surface,
-                          )
-                        : ColorScheme.light(
-                            primary: AppTheme.primary,
-                            surface: colors.surface,
-                          ),
-                  ),
-                  child: child!,
-                );
-              },
+              builder: (context, child) =>
+                  _buildPickerTheme(context, child, colors, isDark),
             );
             if (date != null) {
-              setState(() => _scheduledDate = date);
+              if (!mounted) return;
+              final time = await showTimePicker(
+                context: context,
+                initialTime: _scheduledDate != null
+                    ? TimeOfDay.fromDateTime(_scheduledDate!)
+                    : TimeOfDay.now(),
+                builder: (context, child) =>
+                    _buildPickerTheme(context, child, colors, isDark),
+              );
+              if (time != null) {
+                setState(
+                  () => _scheduledDate = DateTime(
+                    date.year,
+                    date.month,
+                    date.day,
+                    time.hour,
+                    time.minute,
+                  ),
+                );
+              } else {
+                setState(() => _scheduledDate = date);
+              }
             }
           },
           child: Container(
@@ -514,12 +567,17 @@ class _TaskDialogState extends State<TaskDialog> {
             ),
             child: Row(
               children: [
-                Icon(Icons.calendar_today,
-                    size: 16, color: colors.textSecondary),
+                Icon(
+                  Icons.calendar_today,
+                  size: 16,
+                  color: colors.textSecondary,
+                ),
                 const SizedBox(width: 10),
                 Text(
                   _scheduledDate != null
-                      ? DateFormat('MMM dd, yyyy').format(_scheduledDate!)
+                      ? DateFormat(
+                          'MMM dd, yyyy hh:mm a',
+                        ).format(_scheduledDate!)
                       : 'Select date...',
                   style: TextStyle(
                     fontSize: 14,
@@ -533,6 +591,47 @@ class _TaskDialogState extends State<TaskDialog> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildPickerTheme(
+    BuildContext context,
+    Widget? child,
+    AppThemeColors colors,
+    bool isDark,
+  ) {
+    return Theme(
+      data: (isDark ? ThemeData.dark() : ThemeData.light()).copyWith(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppTheme.primary,
+          brightness: isDark ? Brightness.dark : Brightness.light,
+          primary: AppTheme.primary,
+          surface: colors.surface,
+          onSurface: colors.textPrimary,
+        ),
+        dialogTheme: DialogThemeData(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          backgroundColor: colors.surface,
+        ),
+        datePickerTheme: DatePickerThemeData(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          headerBackgroundColor: AppTheme.primary,
+          headerForegroundColor: Colors.white,
+          backgroundColor: colors.surface,
+        ),
+        timePickerTheme: TimePickerThemeData(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          backgroundColor: colors.surface,
+          dialBackgroundColor: colors.surfaceVariant,
+          hourMinuteColor: colors.surfaceVariant,
+          hourMinuteTextColor: colors.textPrimary,
+          dayPeriodColor: colors.surfaceVariant,
+          dayPeriodTextColor: colors.textPrimary,
+        ),
+      ),
+      child: child!,
     );
   }
 

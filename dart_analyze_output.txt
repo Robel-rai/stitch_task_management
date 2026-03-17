@@ -1,0 +1,6 @@
+Analyzing task_dialog.dart...
+
+  error - task_dialog.dart:613:22 - The argument type 'DialogTheme' can't be assigned to the parameter type 'DialogThemeData?'.  - argument_type_not_assignable
+   info - task_dialog.dart:612:9 - 'dialogBackgroundColor' is deprecated and shouldn't be used. Use DialogThemeData.backgroundColor instead. This feature was deprecated after v3.27.0-0.1.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+
+2 issues found.

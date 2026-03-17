@@ -11,6 +11,7 @@ import 'services/notification_service.dart';
 import 'theme/app_theme.dart';
 import 'widgets/sidebar.dart';
 
+
 void main() {
   // Initialize FFI for Windows desktop SQLite support
   sqfliteFfiInit();

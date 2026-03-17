@@ -4,6 +4,7 @@ import '../providers/app_state.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_colors.dart';
 
+
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
@@ -310,7 +311,7 @@ class SettingsScreen extends StatelessWidget {
                         children: [
                           _infoRow('App Name', 'Taskflow', colors),
                           Divider(color: colors.border, height: 24),
-                          _infoRow('Version', '1.2.0', colors),
+                          _infoRow('Version', '1.3.19', colors),
                           Divider(color: colors.border, height: 24),
                           _infoRow('Platform', 'Windows Desktop', colors),
                         ],
