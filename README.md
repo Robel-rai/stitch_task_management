@@ -137,13 +137,25 @@ Click **"View details"** on the dashboard's Weekly Productivity card to open an 
 
 ## 🚀 Getting Started
 
-### Prerequisites
+### 📥 Quick Install (Recommended)
+
+If you just want to use the app without compiling the code, you can download the ready-to-use installer:
+
+1. Open the `TaskFlowExe` folder in this repository.
+2. Download the `TaskFlow_Installer.exe` file.
+3. Run the installer and follow the on-screen instructions to install TaskFlow on your Windows PC.
+
+---
+
+### 💻 Build from Source
+
+#### Prerequisites
 
 - [Flutter SDK](https://flutter.dev/docs/get-started/install) (3.11+)
 - Windows 10/11
 - Visual Studio with C++ desktop development workload
 
-### Installation
+#### Installation
 
 ```bash
 # Clone the repository
