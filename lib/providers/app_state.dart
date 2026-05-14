@@ -40,6 +40,12 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   String? _priorityFilter;
   String? get priorityFilter => _priorityFilter;
 
+  // ─── Date Range Filter ───
+  DateTime? _startDateFilter;
+  DateTime? _endDateFilter;
+  DateTime? get startDateFilter => _startDateFilter;
+  DateTime? get endDateFilter => _endDateFilter;
+
   // ─── Dashboard Metrics ───
   int _totalTasks = 0;
   int get totalTasks => _totalTasks;
@@ -110,6 +116,11 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     final prefs = await SharedPreferences.getInstance();
     _isDarkMode = prefs.getBool('isDarkMode') ?? true;
     _customCategories = prefs.getStringList('customCategories') ?? [];
+    // Load persisted date filters
+    final startStr = prefs.getString('startDateFilter');
+    final endStr = prefs.getString('endDateFilter');
+    if (startStr != null) _startDateFilter = DateTime.tryParse(startStr);
+    if (endStr != null) _endDateFilter = DateTime.tryParse(endStr);
     
     await refreshAll();
     // Register lifecycle observer
@@ -167,13 +178,15 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     ]);
   }
 
-  /// Refresh task list with current filters
+  /// Refresh task list with current filters (all filters stack together)
   Future<void> refreshTasks() async {
     _tasks = await AppDatabase.getAllTasks(
       searchQuery: _searchQuery.isNotEmpty ? _searchQuery : null,
       categoryFilter: _categoryFilter,
       statusFilter: _statusFilter,
       priorityFilter: _priorityFilter,
+      startDate: _startDateFilter,
+      endDate: _endDateFilter,
     );
     notifyListeners();
   }
@@ -214,11 +227,35 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     refreshTasks();
   }
 
-  void clearFilters() {
+  void clearFilters() async {
     _categoryFilter = null;
     _statusFilter = null;
     _priorityFilter = null;
     _searchQuery = '';
+    // Reset date filters
+    _startDateFilter = null;
+    _endDateFilter = null;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('startDateFilter');
+    await prefs.remove('endDateFilter');
+    refreshTasks();
+  }
+
+  // ─── Date Range Filter Operations ───
+  Future<void> setDateRangeFilter(DateTime? start, DateTime? end) async {
+    _startDateFilter = start;
+    _endDateFilter = end;
+    final prefs = await SharedPreferences.getInstance();
+    if (start != null) {
+      await prefs.setString('startDateFilter', start.toIso8601String());
+    } else {
+      await prefs.remove('startDateFilter');
+    }
+    if (end != null) {
+      await prefs.setString('endDateFilter', end.toIso8601String());
+    } else {
+      await prefs.remove('endDateFilter');
+    }
     refreshTasks();
   }
 

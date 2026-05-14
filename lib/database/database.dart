@@ -98,6 +98,8 @@ class AppDatabase {
     String? categoryFilter,
     String? statusFilter,
     String? priorityFilter,
+    DateTime? startDate,
+    DateTime? endDate,
     String? sortBy,
     bool ascending = true,
   }) async {
@@ -121,6 +123,19 @@ class AppDatabase {
     if (priorityFilter != null && priorityFilter.isNotEmpty) {
       where.add('priority = ?');
       whereArgs.add(priorityFilter);
+    }
+    // Date range filter — stacks with all other filters
+    if (startDate != null && endDate != null) {
+      // Ensure end date covers the full day
+      final endOfDay = DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59);
+      where.add('COALESCE(scheduled_date, created_at) >= ? AND COALESCE(scheduled_date, created_at) <= ?');
+      whereArgs.add(startDate.toIso8601String());
+      whereArgs.add(endOfDay.toIso8601String());
+    } else if (startDate != null) {
+      // Single day filter
+      final dateStr = startDate.toIso8601String().split('T')[0];
+      where.add('COALESCE(scheduled_date, created_at) LIKE ?');
+      whereArgs.add('$dateStr%');
     }
 
     final orderBy = sortBy != null

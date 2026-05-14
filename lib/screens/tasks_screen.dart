@@ -4,8 +4,11 @@ import '../models/task.dart';
 import '../providers/app_state.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_colors.dart';
+import 'package:intl/intl.dart';
+
 import '../widgets/task_card.dart';
 import '../widgets/task_dialog.dart';
+import '../widgets/date_range_picker.dart';
 
 class TasksScreen extends StatefulWidget {
   const TasksScreen({super.key});
@@ -130,6 +133,21 @@ class _TasksScreenState extends State<TasksScreen> {
                     ),
                   ),
 
+                  // Date Range Display
+                  if (state.startDateFilter != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
+                      child: Text(
+                        state.endDateFilter != null
+                            ? "Date: "+DateFormat('MMM dd, yyyy').format(state.startDateFilter!)+" - "+DateFormat('MMM dd, yyyy').format(state.endDateFilter!)
+                            : "Date: "+DateFormat('MMM dd, yyyy').format(state.startDateFilter!),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: colors.textSecondary,
+                        ),
+                      ),
+                    ),
+
                   // Filters & View Toggle
                   Padding(
                     padding: const EdgeInsets.all(32),
@@ -155,9 +173,30 @@ class _TasksScreenState extends State<TasksScreen> {
                               icon: Icons.expand_more,
                               onTap: (ctx) => _showPriorityFilter(ctx, state),
                             ),
+                            const SizedBox(width: 12),
+                            // Date Range Filter Button
+                            ElevatedButton.icon(
+                              onPressed: () async {
+                                final DateTimeRange? range = await showCustomDateRangePicker(
+                                  context,
+                                  initialStart: state.startDateFilter,
+                                  initialEnd: state.endDateFilter,
+                                );
+                                if (range != null) {
+                                  await state.setDateRangeFilter(range.start, range.end);
+                                }
+                              },
+                              icon: const Icon(Icons.calendar_today, size: 18),
+                              label: const Text('Date'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.primary,
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              ),
+                            ),
                             if (state.categoryFilter != null ||
                                 state.statusFilter != null ||
-                                state.priorityFilter != null) ...[
+                                state.priorityFilter != null ||
+                                state.startDateFilter != null) ...[
                               const SizedBox(width: 12),
                               TextButton(
                                 onPressed: state.clearFilters,
