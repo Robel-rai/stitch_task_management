@@ -3,7 +3,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{D37E7A6B-99DE-4581-9AE7-23A4DBA4CC61}
 AppName=Task Flow
-AppVersion=1.3.18
+AppVersion=1.4.1
 AppPublisher=Robel
 DefaultDirName={localappdata}\Task Flow
 DisableProgramGroupPage=yes
