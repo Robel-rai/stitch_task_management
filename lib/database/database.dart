@@ -128,13 +128,13 @@ class AppDatabase {
     if (startDate != null && endDate != null) {
       // Ensure end date covers the full day
       final endOfDay = DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59);
-      where.add('COALESCE(scheduled_date, created_at) >= ? AND COALESCE(scheduled_date, created_at) <= ?');
+      where.add('scheduled_date >= ? AND scheduled_date <= ?');
       whereArgs.add(startDate.toIso8601String());
       whereArgs.add(endOfDay.toIso8601String());
     } else if (startDate != null) {
       // Single day filter
       final dateStr = startDate.toIso8601String().split('T')[0];
-      where.add('COALESCE(scheduled_date, created_at) LIKE ?');
+      where.add('scheduled_date LIKE ?');
       whereArgs.add('$dateStr%');
     }
 
@@ -156,7 +156,7 @@ class AppDatabase {
     final dateStr = date.toIso8601String().split('T')[0];
     final results = await db.query(
       'tasks',
-      where: 'COALESCE(scheduled_date, created_at) LIKE ?',
+      where: 'scheduled_date LIKE ?',
       whereArgs: ['$dateStr%'],
     );
     return results.map((m) => Task.fromMap(m)).toList();
@@ -167,7 +167,7 @@ class AppDatabase {
     final db = await database;
     final results = await db.query(
       'tasks',
-      where: 'COALESCE(scheduled_date, created_at) >= ? AND COALESCE(scheduled_date, created_at) <= ?',
+      where: 'scheduled_date >= ? AND scheduled_date <= ?',
       whereArgs: [start.toIso8601String(), end.toIso8601String()],
     );
     return results.map((m) => Task.fromMap(m)).toList();
