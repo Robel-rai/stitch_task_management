@@ -73,12 +73,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 final allTasks = await AppDatabase.getAllTasks(
                                   searchQuery: textEditingValue.text,
                                 );
+                                if (allTasks.isEmpty) {
+                                  return [
+                                    Task(
+                                      id: -1,
+                                      title: 'Add "${textEditingValue.text}"',
+                                    ),
+                                  ];
+                                }
                                 return allTasks.take(3);
                               },
                           displayStringForOption: (Task option) => option.title,
                           onSelected: (Task selection) async {
                             // Clear focus
                             FocusScope.of(context).unfocus();
+
+                            if (selection.id == -1) {
+                              // Create mode - extract title from "Add '...'"
+                              final query = selection.title
+                                  .replaceFirst('Add "', '')
+                                  .replaceFirst('"', '');
+
+                              final result = await showDialog<Task>(
+                                context: context,
+                                builder: (_) => TaskDialog(
+                                  task: Task(title: query),
+                                ),
+                              );
+                              if (result != null && context.mounted) {
+                                context.read<AppState>().createTask(result);
+                              }
+                              return;
+                            }
+
                             // Go to tasks screen
                             state.setNavIndex(1);
                             // Set search query to match so it filters there too
@@ -157,23 +184,58 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           final Task option = options.elementAt(
                                             index,
                                           );
+                                          final isNewTask = option.id == -1;
+
                                           return InkWell(
                                             onTap: () {
                                               onSelected(option);
                                             },
-                                            child: Padding(
+                                            child: Container(
                                               padding:
                                                   const EdgeInsets.symmetric(
                                                     horizontal: 16,
                                                     vertical: 10,
                                                   ),
-                                              child: Text(
-                                                option.title,
-                                                style: TextStyle(
-                                                  fontSize: 13,
-                                                  color: colors.textPrimary,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                              decoration: BoxDecoration(
+                                                border: isNewTask
+                                                    ? Border(
+                                                        top: BorderSide(
+                                                          color: colors.border,
+                                                        ),
+                                                      )
+                                                    : null,
+                                                color: isNewTask
+                                                    ? AppTheme.primary
+                                                    : null,
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  if (isNewTask) ...[
+                                                    const Icon(
+                                                      Icons.add_circle_outline,
+                                                      size: 16,
+                                                      color: Colors.white,
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                  ],
+                                                  Expanded(
+                                                    child: Text(
+                                                      option.title,
+                                                      style: TextStyle(
+                                                        fontSize: 13,
+                                                        color: isNewTask
+                                                            ? Colors.white
+                                                            : colors.textPrimary,
+                                                        fontWeight: isNewTask
+                                                            ? FontWeight.w600
+                                                            : FontWeight.w500,
+                                                      ),
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           );
