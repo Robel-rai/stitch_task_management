@@ -26,6 +26,8 @@ class _TaskDialogState extends State<TaskDialog> {
   DateTime? _scheduledDate;
   late DateTime _createdAt;
   List<Subtask> _subtasks = [];
+  int? _editingSubtaskIndex;
+  late TextEditingController _editSubtaskCtrl;
 
   static const categories = [
     'General',
@@ -60,6 +62,7 @@ class _TaskDialogState extends State<TaskDialog> {
       _status = widget.task!.status;
       _scheduledDate = widget.task!.scheduledDate;
     }
+    _editSubtaskCtrl = TextEditingController();
   }
 
   @override
@@ -67,6 +70,7 @@ class _TaskDialogState extends State<TaskDialog> {
     _titleCtrl.dispose();
     _descCtrl.dispose();
     _newSubtaskCtrl.dispose();
+    _editSubtaskCtrl.dispose();
     super.dispose();
   }
 
@@ -279,27 +283,90 @@ class _TaskDialogState extends State<TaskDialog> {
                           : null,
                     ),
                   ),
-                  title: Text(
-                    subtask.title,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: colors.textPrimary,
-                      decoration: subtask.isCompleted
-                          ? TextDecoration.lineThrough
-                          : null,
-                    ),
-                  ),
-                  trailing: IconButton(
-                    icon: Icon(
-                      Icons.close,
-                      size: 16,
-                      color: colors.textSecondary,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _subtasks.removeAt(index);
-                      });
-                    },
+                  title: _editingSubtaskIndex == index
+                      ? TextField(
+                          controller: _editSubtaskCtrl,
+                          autofocus: true,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: colors.textPrimary,
+                          ),
+                          decoration: InputDecoration(
+                            isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 8,
+                            ),
+                            border: InputBorder.none,
+                          ),
+                          onSubmitted: (val) {
+                            if (val.trim().isNotEmpty) {
+                              setState(() {
+                                _subtasks[index] = subtask.copyWith(
+                                  title: val.trim(),
+                                );
+                                _editingSubtaskIndex = null;
+                              });
+                            }
+                          },
+                        )
+                      : InkWell(
+                          onTap: () {
+                            setState(() {
+                              _editingSubtaskIndex = index;
+                              _editSubtaskCtrl.text = subtask.title;
+                            });
+                          },
+                          child: Text(
+                            subtask.title,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: colors.textPrimary,
+                              decoration: subtask.isCompleted
+                                  ? TextDecoration.lineThrough
+                                  : null,
+                            ),
+                          ),
+                        ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (_editingSubtaskIndex == index)
+                        IconButton(
+                          icon: Icon(
+                            Icons.check,
+                            size: 16,
+                            color: AppTheme.emerald,
+                          ),
+                          onPressed: () {
+                            if (_editSubtaskCtrl.text.trim().isNotEmpty) {
+                              setState(() {
+                                _subtasks[index] = subtask.copyWith(
+                                  title: _editSubtaskCtrl.text.trim(),
+                                );
+                                _editingSubtaskIndex = null;
+                              });
+                            }
+                          },
+                        ),
+                      IconButton(
+                        icon: Icon(
+                          _editingSubtaskIndex == index
+                              ? Icons.close
+                              : Icons.close,
+                          size: 16,
+                          color: colors.textSecondary,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            if (_editingSubtaskIndex == index) {
+                              _editingSubtaskIndex = null;
+                            } else {
+                              _subtasks.removeAt(index);
+                            }
+                          });
+                        },
+                      ),
+                    ],
                   ),
                 );
               },
